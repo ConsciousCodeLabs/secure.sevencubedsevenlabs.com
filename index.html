@@ -39,7 +39,6 @@
             line-height: 1.6;
         }
 
-        /* Background */
         .bg-pattern {
             position: fixed;
             top: 0;
@@ -53,7 +52,6 @@
                 var(--dark);
         }
 
-        /* Header */
         header {
             padding: 1.5rem 2rem;
             display: flex;
@@ -91,14 +89,12 @@
             color: var(--white);
         }
 
-        /* Main Container */
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 3rem 2rem;
         }
 
-        /* Page Title */
         .page-title {
             text-align: center;
             margin-bottom: 3rem;
@@ -122,7 +118,6 @@
             font-size: 1.1rem;
         }
 
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 0.5rem;
@@ -158,7 +153,6 @@
             color: var(--white);
         }
 
-        /* Card */
         .card {
             background: var(--dark-card);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -167,7 +161,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Drop Zone */
         .drop-zone {
             border: 2px dashed rgba(99, 102, 241, 0.5);
             border-radius: 16px;
@@ -202,7 +195,6 @@
             display: none;
         }
 
-        /* File Info */
         .file-info {
             display: none;
             background: rgba(16, 185, 129, 0.1);
@@ -245,7 +237,6 @@
             padding: 0.5rem;
         }
 
-        /* Pathway Selector */
         .pathway-section {
             margin-top: 2rem;
         }
@@ -308,7 +299,6 @@
             font-weight: 600;
         }
 
-        /* Action Button */
         .action-btn {
             width: 100%;
             padding: 1.25rem;
@@ -353,7 +343,6 @@
             transform: none;
         }
 
-        /* Results */
         .results {
             display: none;
             margin-top: 2rem;
@@ -418,7 +407,6 @@
             background: var(--primary-dark);
         }
 
-        /* Stats */
         .encryption-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -446,40 +434,59 @@
             letter-spacing: 0.5px;
         }
 
-        /* Decrypt Section - Text Areas */
-        .decrypt-input {
+        /* Decrypt file drop zones */
+        .decrypt-drop-zone {
+            border: 2px dashed rgba(16, 185, 129, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(16, 185, 129, 0.05);
             margin-bottom: 1.5rem;
         }
 
-        .decrypt-input label {
-            display: block;
-            font-weight: 600;
+        .decrypt-drop-zone:hover, .decrypt-drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .decrypt-drop-zone.loaded {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .decrypt-drop-zone h4 {
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
-        .decrypt-input textarea {
-            width: 100%;
-            padding: 1rem;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: var(--dark-lighter);
-            color: var(--white);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .decrypt-input textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .decrypt-input textarea::placeholder {
+        .decrypt-drop-zone p {
             color: var(--gray);
+            font-size: 0.875rem;
         }
 
-        /* Loading */
+        .decrypt-drop-zone .loaded-info {
+            display: none;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .decrypt-drop-zone.loaded .loaded-info {
+            display: block;
+        }
+
+        .decrypt-drop-zone.loaded .default-info {
+            display: none;
+        }
+
+        .decrypt-drop-zone input {
+            display: none;
+        }
+
         .loading {
             display: none;
         }
@@ -505,7 +512,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Error */
         .error-message {
             display: none;
             background: rgba(239, 68, 68, 0.1);
@@ -520,7 +526,6 @@
             display: block;
         }
 
-        /* Info Box */
         .info-box {
             background: rgba(99, 102, 241, 0.1);
             border: 1px solid rgba(99, 102, 241, 0.3);
@@ -543,7 +548,6 @@
             line-height: 1.7;
         }
 
-        /* Footer */
         footer {
             text-align: center;
             padding: 2rem;
@@ -558,7 +562,6 @@
             text-decoration: none;
         }
 
-        /* Responsive */
         @media (max-width: 600px) {
             .container {
                 padding: 2rem 1rem;
@@ -587,7 +590,6 @@
 <body>
     <div class="bg-pattern"></div>
 
-    <!-- Header -->
     <header>
         <a href="https://sevencubedsevenlabs.com" class="logo">7³×7 Secure</a>
         <div class="header-links">
@@ -597,14 +599,12 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <div class="container">
         <div class="page-title">
             <h1>🔐 <span>Secure Encrypt</span></h1>
             <p>Encrypt your files with 2,401 unique pathways. Zero trust — you hold the keys.</p>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <button class="tab active" onclick="switchTab('encrypt')">
                 🔒 Encrypt
@@ -616,7 +616,6 @@
 
         <!-- Encrypt Panel -->
         <div id="encrypt-panel" class="card">
-            <!-- Drop Zone -->
             <div class="drop-zone" id="dropZone">
                 <div class="drop-zone-icon">📁</div>
                 <h3>Drop your file here</h3>
@@ -624,7 +623,6 @@
                 <input type="file" id="fileInput">
             </div>
 
-            <!-- File Info -->
             <div class="file-info" id="fileInfo">
                 <div class="file-info-icon">📄</div>
                 <div class="file-info-details">
@@ -634,7 +632,6 @@
                 <button class="file-info-remove" onclick="clearFile()">×</button>
             </div>
 
-            <!-- Pathway Selector -->
             <div class="pathway-section">
                 <h4>🛤️ Select Encryption Pathway</h4>
                 <div class="pathway-grid">
@@ -692,21 +689,17 @@
                 </div>
             </div>
 
-            <!-- Encrypt Button -->
             <button class="action-btn encrypt" id="encryptBtn" onclick="encryptFile()" disabled>
                 🔒 Encrypt File
             </button>
 
-            <!-- Loading -->
             <div class="loading" id="encryptLoading">
                 <div class="spinner"></div>
                 <span>Encrypting through 4 shells...</span>
             </div>
 
-            <!-- Error -->
             <div class="error-message" id="encryptError"></div>
 
-            <!-- Results -->
             <div class="results" id="encryptResults">
                 <h3>✅ Encryption Complete!</h3>
                 
@@ -728,7 +721,7 @@
                         <div class="result-item-icon">🔑</div>
                         <div>
                             <div class="result-item-name" id="keyFileName">file.key</div>
-                            <div class="result-item-size">64 bytes</div>
+                            <div class="result-item-size">Contains key + pathway</div>
                         </div>
                     </div>
                     <button class="download-btn" onclick="downloadKey()">
@@ -752,7 +745,6 @@
                 </div>
             </div>
 
-            <!-- Info Box -->
             <div class="info-box">
                 <h4>🔐 Zero Trust Encryption</h4>
                 <p>
@@ -765,19 +757,26 @@
 
         <!-- Decrypt Panel -->
         <div id="decrypt-panel" class="card" style="display: none;">
-            <div class="decrypt-input">
-                <label>📄 Encrypted Data (Ciphertext)</label>
-                <textarea id="decryptCiphertext" placeholder="Paste your ciphertext here, or drag & drop your .encrypted file..."></textarea>
+            
+            <!-- Encrypted File Drop -->
+            <div class="decrypt-drop-zone" id="encryptedDropZone">
+                <h4>📄 Drop .encrypted file here</h4>
+                <p class="default-info">or click to browse</p>
+                <p class="loaded-info">✅ Encrypted file loaded!</p>
+                <input type="file" id="encryptedFileInput" accept=".encrypted">
             </div>
 
-            <div class="decrypt-input">
-                <label>🔑 Encryption Key</label>
-                <textarea id="decryptKey" placeholder="Paste your key here, or drag & drop your .key file..." style="min-height: 60px;"></textarea>
+            <!-- Key File Drop -->
+            <div class="decrypt-drop-zone" id="keyDropZone">
+                <h4>🔑 Drop .key file here</h4>
+                <p class="default-info">or click to browse</p>
+                <p class="loaded-info">✅ Key file loaded!</p>
+                <input type="file" id="keyFileInput" accept=".key">
             </div>
 
-            <!-- Pathway Selector for Decrypt -->
+            <!-- Pathway Display (auto-filled from key file) -->
             <div class="pathway-section">
-                <h4>🛤️ Enter Pathway Used</h4>
+                <h4>🛤️ Pathway (auto-detected from key file)</h4>
                 <div class="pathway-grid">
                     <div class="pathway-shell">
                         <label>Shell 1</label>
@@ -830,21 +829,17 @@
                 </div>
             </div>
 
-            <!-- Decrypt Button -->
-            <button class="action-btn decrypt" id="decryptBtn" onclick="decryptFile()">
-                🔓 Decrypt Data
+            <button class="action-btn decrypt" id="decryptBtn" onclick="decryptFile()" disabled>
+                🔓 Decrypt File
             </button>
 
-            <!-- Loading -->
             <div class="loading" id="decryptLoading">
                 <div class="spinner"></div>
                 <span>Decrypting through 4 shells...</span>
             </div>
 
-            <!-- Error -->
             <div class="error-message" id="decryptError"></div>
 
-            <!-- Decrypt Results -->
             <div class="results" id="decryptResults">
                 <h3>✅ Decryption Complete!</h3>
                 
@@ -852,7 +847,7 @@
                     <div class="result-item-info">
                         <div class="result-item-icon">📄</div>
                         <div>
-                            <div class="result-item-name">Decrypted File</div>
+                            <div class="result-item-name" id="decryptedFileName">Decrypted File</div>
                             <div class="result-item-size" id="decryptedFileSize">Original restored</div>
                         </div>
                     </div>
@@ -862,19 +857,17 @@
                 </div>
             </div>
 
-            <!-- Info Box -->
             <div class="info-box">
                 <h4>🔓 Decryption Requirements</h4>
                 <p>
-                    To decrypt, you need: <strong>1)</strong> The ciphertext (encrypted data), 
-                    <strong>2)</strong> The encryption key, and <strong>3)</strong> The exact pathway used during encryption.
-                    All three must match for successful decryption.
+                    Drop your <strong>.encrypted</strong> file and <strong>.key</strong> file above.
+                    The pathway will be auto-detected from your key file.
+                    All three pieces (ciphertext, key, pathway) must match for successful decryption.
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
         <p>
             © 2026 <a href="https://sevencubedsevenlabs.com">Seven Cubed Seven Labs LLC</a>. Patent Pending.<br>
@@ -883,7 +876,6 @@
     </footer>
 
     <script>
-        // API Endpoint
         const API_BASE = 'https://api.sevencubedsevenlabs.com';
         
         // State
@@ -891,6 +883,11 @@
         let encryptionResult = null;
         let decryptionResult = null;
         let originalFileName = '';
+        
+        // Decrypt state
+        let loadedCiphertext = null;
+        let loadedKey = null;
+        let loadedKeyData = null;
 
         // Tab Switching
         function switchTab(tab) {
@@ -901,7 +898,8 @@
             document.getElementById('decrypt-panel').style.display = tab === 'decrypt' ? 'block' : 'none';
         }
 
-        // File Handling
+        // ========== ENCRYPT SECTION ==========
+        
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
 
@@ -931,7 +929,6 @@
         });
 
         function handleFile(file) {
-            // 5MB limit for demo
             if (file.size > 5 * 1024 * 1024) {
                 showError('encryptError', 'File too large. Maximum 5MB for demo.');
                 return;
@@ -964,7 +961,6 @@
             return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
         }
 
-        // Pathway Display Update
         document.querySelectorAll('#encrypt-panel select').forEach(select => {
             select.addEventListener('change', updatePathwayDisplay);
         });
@@ -992,7 +988,6 @@
             ];
         }
 
-        // Encrypt File
         async function encryptFile() {
             if (!selectedFile) return;
 
@@ -1006,11 +1001,9 @@
             hideError('encryptError');
 
             try {
-                // Read file as base64
                 const base64Data = await fileToBase64(selectedFile);
                 const pathway = getEncryptPathway();
 
-                // Call API
                 const response = await fetch(`${API_BASE}/encrypt`, {
                     method: 'POST',
                     headers: {
@@ -1029,7 +1022,6 @@
                 const data = await response.json();
                 encryptionResult = data;
 
-                // Update UI
                 const baseName = originalFileName.replace(/\.[^/.]+$/, '');
                 document.getElementById('encryptedFileName').textContent = `${baseName}.encrypted`;
                 document.getElementById('encryptedFileSize').textContent = formatSize(data.ciphertext.length);
@@ -1051,13 +1043,114 @@
             }
         }
 
-        // Decrypt File
-        async function decryptFile() {
-            const ciphertext = document.getElementById('decryptCiphertext').value.trim();
-            const key = document.getElementById('decryptKey').value.trim();
+        // ========== DECRYPT SECTION ==========
+        
+        const encryptedDropZone = document.getElementById('encryptedDropZone');
+        const encryptedFileInput = document.getElementById('encryptedFileInput');
+        const keyDropZone = document.getElementById('keyDropZone');
+        const keyFileInput = document.getElementById('keyFileInput');
 
-            if (!ciphertext || !key) {
-                showError('decryptError', 'Please provide both ciphertext and key.');
+        // Encrypted file drop zone
+        encryptedDropZone.addEventListener('click', () => encryptedFileInput.click());
+        
+        encryptedDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            encryptedDropZone.classList.add('dragover');
+        });
+
+        encryptedDropZone.addEventListener('dragleave', () => {
+            encryptedDropZone.classList.remove('dragover');
+        });
+
+        encryptedDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            encryptedDropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleEncryptedFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        encryptedFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleEncryptedFile(e.target.files[0]);
+            }
+        });
+
+        // Key file drop zone
+        keyDropZone.addEventListener('click', () => keyFileInput.click());
+        
+        keyDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            keyDropZone.classList.add('dragover');
+        });
+
+        keyDropZone.addEventListener('dragleave', () => {
+            keyDropZone.classList.remove('dragover');
+        });
+
+        keyDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            keyDropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleKeyFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        keyFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleKeyFile(e.target.files[0]);
+            }
+        });
+
+        async function handleEncryptedFile(file) {
+            try {
+                const text = await file.text();
+                loadedCiphertext = text.trim();
+                encryptedDropZone.classList.add('loaded');
+                checkDecryptReady();
+                hideError('decryptError');
+            } catch (error) {
+                showError('decryptError', 'Failed to read encrypted file');
+            }
+        }
+
+        async function handleKeyFile(file) {
+            try {
+                const text = await file.text();
+                
+                // Try to parse as JSON (our key format)
+                try {
+                    loadedKeyData = JSON.parse(text);
+                    loadedKey = loadedKeyData.key;
+                    
+                    // Auto-fill pathway from key file
+                    if (loadedKeyData.pathway && loadedKeyData.pathway.length === 4) {
+                        document.getElementById('decryptShell1').value = loadedKeyData.pathway[0];
+                        document.getElementById('decryptShell2').value = loadedKeyData.pathway[1];
+                        document.getElementById('decryptShell3').value = loadedKeyData.pathway[2];
+                        document.getElementById('decryptShell4').value = loadedKeyData.pathway[3];
+                    }
+                } catch {
+                    // If not JSON, assume it's just the raw key
+                    loadedKey = text.trim();
+                }
+                
+                keyDropZone.classList.add('loaded');
+                checkDecryptReady();
+                hideError('decryptError');
+            } catch (error) {
+                showError('decryptError', 'Failed to read key file');
+            }
+        }
+
+        function checkDecryptReady() {
+            const decryptBtn = document.getElementById('decryptBtn');
+            decryptBtn.disabled = !(loadedCiphertext && loadedKey);
+        }
+
+        async function decryptFile() {
+            if (!loadedCiphertext || !loadedKey) {
+                showError('decryptError', 'Please load both the encrypted file and key file.');
                 return;
             }
 
@@ -1079,37 +1172,49 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        ciphertext: ciphertext,
-                        key: key,
+                        ciphertext: loadedCiphertext,
+                        key: loadedKey,
                         pathway: pathway
                     })
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || `API Error: ${response.status}`);
+                    let errorMsg = 'Decryption failed';
+                    if (errorData.detail) {
+                        if (Array.isArray(errorData.detail)) {
+                            errorMsg = errorData.detail.map(d => d.msg || d).join(', ');
+                        } else {
+                            errorMsg = errorData.detail;
+                        }
+                    }
+                    throw new Error(errorMsg);
                 }
 
                 const data = await response.json();
                 decryptionResult = data;
 
+                // Set filename from key data if available
+                if (loadedKeyData && loadedKeyData.originalFile) {
+                    document.getElementById('decryptedFileName').textContent = loadedKeyData.originalFile;
+                }
                 document.getElementById('decryptedFileSize').textContent = formatSize(data.plaintext.length);
                 results.classList.add('show');
 
             } catch (error) {
-                showError('decryptError', 'Decryption failed: ' + error.message);
+                showError('decryptError', error.message);
             } finally {
                 decryptBtn.disabled = false;
                 loading.classList.remove('show');
             }
         }
 
-        // File Utilities
+        // ========== UTILITIES ==========
+
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => {
-                    // Remove data URL prefix
                     const base64 = reader.result.split(',')[1];
                     resolve(base64);
                 };
@@ -1138,19 +1243,28 @@
 
         function downloadDecrypted() {
             if (!decryptionResult) return;
-            // Decode base64 back to binary
-            const binary = atob(decryptionResult.plaintext);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) {
-                bytes[i] = binary.charCodeAt(i);
+            try {
+                const binary = atob(decryptionResult.plaintext);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                const blob = new Blob([bytes]);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Use original filename if available
+                let filename = 'decrypted_file';
+                if (loadedKeyData && loadedKeyData.originalFile) {
+                    filename = loadedKeyData.originalFile;
+                }
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                showError('decryptError', 'Failed to download: ' + error.message);
             }
-            const blob = new Blob([bytes]);
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'decrypted_file';
-            a.click();
-            URL.revokeObjectURL(url);
         }
 
         function downloadText(content, filename) {
@@ -1163,7 +1277,6 @@
             URL.revokeObjectURL(url);
         }
 
-        // Error Handling
         function showError(elementId, message) {
             const el = document.getElementById(elementId);
             el.textContent = '❌ ' + message;
