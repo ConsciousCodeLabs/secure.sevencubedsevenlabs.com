@@ -1119,27 +1119,54 @@
         // API KEY MANAGEMENT
         // ============================================
         async function validateAndApplyKey(key) {
-            if (!key) {
-                clearApiKey();
-                return;
-            }
-            
-            // Basic format validation (64 hex chars)
-            if (!/^[a-f0-9]{64}$/i.test(key)) {
-                showKeyStatus('invalid', '❌ Invalid key format (expected 64 hex characters)');
-                return;
-            }
-            
-            // For now, accept valid format keys
-            // In production, you'd validate against the server
+    if (!key) {
+        clearApiKey();
+        return;
+    }
+    
+    // Basic format validation (64 hex chars)
+    if (!/^[a-f0-9]{64}$/i.test(key)) {
+        showKeyStatus('invalid', '❌ Invalid key format (expected 64 hex characters)');
+        return;
+    }
+    
+    // Validate against server to get actual tier
+    try {
+        const response = await fetch(`${API_BASE}/validate-key`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ api_key: key })
+        });
+        
+        const result = await response.json();
+        
+        if (result.valid) {
             currentApiKey = key;
             localStorage.setItem(STORAGE_KEY_API, key);
             
-            // Update UI for Starter tier
-            setTier('starter');
-            showKeyStatus('valid', '✅ API key applied - Starter Plan active');
+            // Set the ACTUAL tier from server
+            setTier(result.tier);
+            showKeyStatus('valid', `✅ API key applied - ${result.tier.charAt(0).toUpperCase() + result.tier.slice(1)} Plan active`);
             elements.apiKeySection.classList.add('has-key');
+            
+            // Update usage from server response
+            if (result.usage) {
+                usageCount = result.usage.current;
+                updateUsageDisplay();
+            }
+        } else {
+            showKeyStatus('invalid', '❌ ' + result.message);
         }
+    } catch (error) {
+        // If server validation fails, fall back to format-only check
+        console.warn('Server validation failed, using format check only:', error);
+        currentApiKey = key;
+        localStorage.setItem(STORAGE_KEY_API, key);
+        setTier('starter');
+        showKeyStatus('valid', '✅ API key applied - Starter Plan active');
+        elements.apiKeySection.classList.add('has-key');
+    }
+}
         
         function clearApiKey() {
             currentApiKey = null;
