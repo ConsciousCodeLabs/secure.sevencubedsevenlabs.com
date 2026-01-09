@@ -4,874 +4,819 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure File Encryption | Patent #65 | Seven Cubed Seven Labs</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta name="description" content="Encrypt your files with 2,401 unique pathways. 4-shell recursive encryption. Patent pending technology.">
+    
+    <!-- JSZip for batch download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
-        
         :root {
-            --primary: #4F46E5;
-            --primary-dark: #3730a3;
-            --success: #10b981;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #0ea5e9;
+            --accent: #10b981;
             --warning: #f59e0b;
-            --danger: #ef4444;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-400: #94a3b8;
-            --gray-500: #64748b;
-            --gray-600: #475569;
-            --gray-700: #334155;
-            --gray-800: #1e293b;
-            --gray-900: #0f172a;
+            --error: #ef4444;
+            --dark: #0f172a;
+            --dark-lighter: #1e293b;
+            --dark-card: #1a2332;
+            --gray: #64748b;
+            --light: #f1f5f9;
+            --white: #ffffff;
+            --border: #334155;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #0ea5e9 100%);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: var(--white);
             min-height: 100vh;
-            color: var(--gray-100);
+            line-height: 1.6;
         }
-        
+
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 2rem;
         }
-        
+
         /* Header */
         .header {
             text-align: center;
             margin-bottom: 2rem;
         }
-        
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: white;
+
+        .header h1 {
+            font-size: 2rem;
             margin-bottom: 0.5rem;
         }
-        
-        .logo span {
-            color: var(--primary);
+
+        .header h1 .gold { color: #fbbf24; }
+        .header h1 .cyan { color: var(--secondary); }
+
+        .header p {
+            color: var(--gray);
+            font-size: 0.95rem;
         }
-        
-        .tagline {
-            color: var(--gray-400);
-            font-size: 0.9rem;
-        }
-        
-        /* Status Bar */
-        .status-bar {
-            background: var(--gray-800);
-            border: 1px solid var(--gray-700);
+
+        /* Tier Status Bar */
+        .tier-bar {
+            background: var(--dark-card);
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
-        
-        .status-bar.free {
-            border-color: var(--gray-600);
+
+        .tier-bar.enterprise {
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
         }
-        
-        .status-bar.starter {
-            border-color: var(--primary);
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+
+        .tier-bar.starter {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
         }
-        
-        .status-bar.enterprise {
-            border-color: var(--warning);
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(234, 179, 8, 0.1) 100%);
-        }
-        
-        .tier-badge {
+
+        .tier-info {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
+            gap: 0.75rem;
         }
-        
-        .tier-badge.free {
-            color: var(--gray-400);
-        }
-        
-        .tier-badge.starter {
-            color: var(--primary);
-        }
-        
-        .tier-badge.enterprise {
-            color: var(--warning);
-        }
-        
+
         .tier-icon {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
         }
-        
+
+        .tier-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .tier-name.enterprise { color: #fbbf24; }
+        .tier-name.starter { color: var(--accent); }
+        .tier-name.free { color: var(--gray); }
+
         .usage-info {
             text-align: right;
-            font-size: 0.85rem;
-            color: var(--gray-400);
         }
-        
+
         .usage-count {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.1rem;
-            color: white;
-            font-weight: 600;
-        }
-        
-        .upgrade-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        
-        .upgrade-link:hover {
-            text-decoration: underline;
-        }
-        
-        /* Main Card */
-        .main-card {
-            background: var(--gray-800);
-            border: 1px solid var(--gray-700);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #0ea5e9 100%);
-            padding: 1.5rem;
-            text-align: center;
-        }
-        
-        .card-header h1 {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        
-        .card-header p {
-            opacity: 0.9;
-            font-size: 0.9rem;
+
+        .usage-label {
+            font-size: 0.8rem;
+            color: var(--gray);
         }
-        
-        .card-body {
-            padding: 2rem;
-        }
-        
-        /* API Key Section */
-        .api-key-section {
-            background: var(--gray-900);
-            border: 1px solid var(--gray-700);
-            border-radius: 12px;
-            padding: 1.25rem;
+
+        /* Main Card */
+        .main-card {
+            background: var(--gradient);
+            border-radius: 16px;
+            padding: 3px;
             margin-bottom: 1.5rem;
         }
-        
-        .api-key-section.has-key {
-            border-color: var(--success);
-            background: rgba(16, 185, 129, 0.1);
+
+        .main-card-inner {
+            background: var(--dark-card);
+            border-radius: 14px;
+            padding: 1.5rem;
         }
-        
+
+        .card-header {
+            text-align: center;
+            padding: 1rem;
+            background: var(--gradient);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .card-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* API Key Section */
+        .api-key-section {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
         .api-key-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.75rem;
         }
-        
-        .api-key-label {
-            font-weight: 600;
-            font-size: 0.9rem;
+
+        .api-key-title {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-weight: 600;
         }
-        
-        .api-key-label .icon {
-            font-size: 1.1rem;
-        }
-        
+
         .api-key-hint {
-            font-size: 0.75rem;
-            color: var(--gray-500);
+            font-size: 0.8rem;
+            color: var(--gray);
         }
-        
-        .api-key-input-wrapper {
-            position: relative;
+
+        .api-key-input-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
-        
+
         .api-key-input {
-            width: 100%;
+            flex: 1;
+            background: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
             padding: 0.75rem 1rem;
-            padding-right: 100px;
-            background: var(--gray-800);
-            border: 1px solid var(--gray-600);
-            border-radius: 8px;
-            color: white;
+            color: var(--white);
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
         }
-        
+
         .api-key-input:focus {
             outline: none;
             border-color: var(--primary);
         }
-        
-        .api-key-input::placeholder {
-            color: var(--gray-500);
-        }
-        
-        .api-key-actions {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            gap: 0.5rem;
-        }
-        
+
         .btn-small {
-            padding: 0.4rem 0.75rem;
-            font-size: 0.75rem;
+            padding: 0.75rem 1rem;
             border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
             border: none;
             cursor: pointer;
-            font-weight: 500;
             transition: all 0.2s;
         }
-        
+
         .btn-apply {
             background: var(--primary);
             color: white;
         }
-        
+
         .btn-apply:hover {
             background: var(--primary-dark);
         }
-        
+
         .btn-clear {
-            background: var(--gray-700);
-            color: var(--gray-300);
+            background: var(--dark-lighter);
+            color: var(--gray);
         }
-        
+
         .btn-clear:hover {
-            background: var(--gray-600);
+            background: var(--border);
+            color: var(--white);
         }
-        
-        .api-key-status {
-            margin-top: 0.75rem;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+
+        .key-status {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
         }
-        
-        .api-key-status.valid {
-            color: var(--success);
+
+        .key-status.valid { color: var(--accent); }
+        .key-status.invalid { color: var(--error); }
+
+        .upgrade-link {
+            font-size: 0.85rem;
+            color: var(--gray);
         }
-        
-        .api-key-status.invalid {
-            color: var(--danger);
-        }
-        
-        .api-key-footer {
-            margin-top: 0.75rem;
-            font-size: 0.8rem;
-            color: var(--gray-500);
-        }
-        
-        .api-key-footer a {
-            color: var(--primary);
+
+        .upgrade-link a {
+            color: var(--secondary);
             text-decoration: none;
         }
-        
-        .api-key-footer a:hover {
+
+        .upgrade-link a:hover {
             text-decoration: underline;
         }
-        
+
         /* Drop Zone */
         .drop-zone {
-            border: 2px dashed var(--gray-600);
+            border: 2px dashed var(--border);
             border-radius: 12px;
             padding: 3rem 2rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
         }
-        
-        .drop-zone:hover, .drop-zone.dragover {
+
+        .drop-zone:hover, .drop-zone.drag-over {
             border-color: var(--primary);
-            background: rgba(79, 70, 229, 0.1);
+            background: rgba(99, 102, 241, 0.1);
         }
-        
+
         .drop-zone-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
+            opacity: 0.7;
         }
-        
+
         .drop-zone-text {
-            color: var(--gray-300);
+            font-size: 1.1rem;
             margin-bottom: 0.5rem;
         }
-        
+
         .drop-zone-hint {
-            color: var(--gray-500);
             font-size: 0.85rem;
+            color: var(--gray);
         }
-        
-        .file-input {
-            display: none;
+
+        .drop-zone-hint .batch-hint {
+            color: var(--accent);
+            font-weight: 600;
         }
-        
-        /* File Info */
-        .file-info {
-            background: var(--gray-900);
-            border-radius: 10px;
-            padding: 1rem;
+
+        /* File Queue */
+        .file-queue {
             margin-bottom: 1.5rem;
-            display: none;
         }
-        
-        .file-info.visible {
+
+        .file-queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .file-queue-title {
+            font-weight: 600;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .btn-clear-all {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--gray);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear-all:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .file-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
             gap: 1rem;
         }
-        
-        .file-icon {
-            font-size: 2rem;
+
+        .file-item:last-child {
+            border-bottom: none;
         }
-        
+
+        .file-icon {
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+
         .file-details {
             flex: 1;
+            min-width: 0;
         }
-        
+
         .file-name {
-            font-weight: 600;
-            color: white;
-            word-break: break-all;
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        
+
         .file-size {
-            font-size: 0.85rem;
-            color: var(--gray-400);
+            font-size: 0.75rem;
+            color: var(--gray);
         }
-        
+
+        .file-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-icon {
+            font-size: 1.2rem;
+        }
+
+        .status-icon.pending { color: var(--gray); }
+        .status-icon.encrypting { color: var(--warning); }
+        .status-icon.done { color: var(--accent); }
+        .status-icon.error { color: var(--error); }
+
+        .file-progress {
+            width: 80px;
+            height: 6px;
+            background: var(--dark);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .file-progress-bar {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
         .file-remove {
-            background: var(--gray-700);
+            background: transparent;
             border: none;
-            color: var(--gray-400);
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            color: var(--gray);
             cursor: pointer;
-            font-size: 1.25rem;
+            padding: 0.25rem;
+            font-size: 1.2rem;
+            transition: color 0.2s;
         }
-        
+
         .file-remove:hover {
-            background: var(--danger);
-            color: white;
+            color: var(--error);
         }
-        
-        /* Pathway Selector */
+
+        /* Pathway Section */
         .pathway-section {
             margin-bottom: 1.5rem;
         }
-        
+
         .pathway-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
-        
-        .pathway-label {
+
+        .pathway-title {
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
-        .pathway-presets {
+
+        .preset-buttons {
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .preset-btn {
-            padding: 0.35rem 0.75rem;
-            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 6px;
-            border: 1px solid var(--gray-600);
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
             background: transparent;
-            color: var(--gray-400);
+            color: var(--gray);
             cursor: pointer;
             transition: all 0.2s;
         }
-        
+
         .preset-btn:hover, .preset-btn.active {
             border-color: var(--primary);
-            background: var(--primary);
-            color: white;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--white);
         }
-        
-        .pathway-grid {
+
+        .shell-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
+            margin-bottom: 1rem;
         }
-        
-        .shell-selector {
-            background: var(--gray-900);
-            border-radius: 10px;
-            padding: 1rem;
+
+        .shell-item {
             text-align: center;
         }
-        
+
         .shell-label {
             font-size: 0.75rem;
-            color: var(--gray-500);
+            color: var(--gray);
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+
         .shell-select {
             width: 100%;
-            padding: 0.6rem;
-            background: var(--gray-800);
-            border: 1px solid var(--gray-600);
+            background: var(--dark);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            color: white;
+            padding: 0.75rem;
+            color: var(--white);
             font-size: 1.1rem;
             font-weight: 600;
             text-align: center;
             cursor: pointer;
+            appearance: none;
         }
-        
+
         .shell-select:focus {
             outline: none;
             border-color: var(--primary);
         }
-        
+
         .pathway-display {
             text-align: center;
-            margin-top: 1rem;
             font-family: 'JetBrains Mono', monospace;
-            color: var(--primary);
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--secondary);
         }
-        
+
         /* Action Buttons */
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
+            margin-bottom: 1rem;
         }
-        
+
         .btn {
             padding: 1rem 1.5rem;
             border-radius: 10px;
-            border: none;
             font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #0ea5e9 100%);
-            color: white;
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .btn-secondary {
-            background: var(--gray-700);
-            color: var(--gray-300);
-        }
-        
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--gray-600);
-        }
-        
-        .btn-secondary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* Results Section */
-        .results-section {
-            margin-top: 2rem;
-            display: none;
-        }
-        
-        .results-section.visible {
-            display: block;
-        }
-        
-        .result-card {
-            background: var(--gray-900);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .result-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        
-        .result-icon {
-            font-size: 1.5rem;
-        }
-        
-        .result-title {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--gray-700);
-        }
-        
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        
-        .result-label {
-            color: var(--gray-400);
-        }
-        
-        .result-value {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--success);
-        }
-        
-        .download-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .btn-download {
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
             border: none;
-            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            transition: all 0.2s;
         }
-        
-        .btn-download.encrypted {
-            background: var(--primary);
+
+        .btn-encrypt {
+            background: var(--gradient);
             color: white;
         }
-        
-        .btn-download.key {
-            background: var(--success);
-            color: white;
-        }
-        
-        .btn-download:hover {
+
+        .btn-encrypt:hover:not(:disabled) {
             transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
         }
-        
-        /* Warning Banner */
-        .warning-banner {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid var(--warning);
+
+        .btn-encrypt:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-download {
+            background: var(--dark-lighter);
+            color: var(--white);
+            border: 1px solid var(--border);
+        }
+
+        .btn-download:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .btn-download:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Progress Section */
+        .batch-progress {
+            background: var(--dark-lighter);
             border-radius: 10px;
             padding: 1rem;
-            margin-top: 1rem;
-            display: flex;
-            gap: 0.75rem;
-            align-items: flex-start;
-        }
-        
-        .warning-banner .icon {
-            font-size: 1.25rem;
-            color: var(--warning);
-        }
-        
-        .warning-banner .text {
-            font-size: 0.85rem;
-            color: var(--gray-300);
-        }
-        
-        .warning-banner strong {
-            color: var(--warning);
-        }
-        
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .loading-overlay.visible {
-            display: flex;
-        }
-        
-        .loading-content {
-            text-align: center;
-        }
-        
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid var(--gray-700);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            color: var(--gray-300);
-        }
-        
-        /* Rate Limit Warning */
-        .rate-limit-warning {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--danger);
-            border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             display: none;
         }
-        
-        .rate-limit-warning.visible {
+
+        .batch-progress.active {
             display: block;
         }
-        
-        .rate-limit-warning h3 {
-            color: var(--danger);
-            margin-bottom: 0.5rem;
+
+        .batch-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
         }
-        
-        .rate-limit-warning p {
-            color: var(--gray-400);
+
+        .batch-progress-text {
+            font-weight: 500;
+        }
+
+        .batch-progress-count {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .batch-progress-bar {
+            height: 8px;
+            background: var(--dark);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .batch-progress-fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 4px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
         }
-        
-        .rate-limit-warning .btn {
-            display: inline-flex;
+
+        .results-title {
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
+
+        .btn-download-all {
+            background: var(--accent);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-download-all:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .results-summary {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
         /* Footer */
         .footer {
             text-align: center;
-            padding: 2rem;
-            color: var(--gray-500);
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .footer-brand {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--secondary);
+            text-decoration: none;
             font-size: 0.85rem;
         }
-        
-        .footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        
-        .footer a:hover {
+
+        .footer-links a:hover {
             text-decoration: underline;
         }
-        
-        .footer-links {
-            margin-top: 0.5rem;
+
+        /* Hidden file input */
+        #fileInput {
+            display: none;
         }
-        
-        .footer-links a {
-            margin: 0 0.75rem;
+
+        /* Animations */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
-        
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
         /* Responsive */
-        @media (max-width: 640px) {
+        @media (max-width: 600px) {
             .container {
                 padding: 1rem;
             }
-            
-            .status-bar {
+
+            .shell-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .tier-bar {
                 flex-direction: column;
+                gap: 1rem;
                 text-align: center;
             }
-            
+
             .usage-info {
                 text-align: center;
             }
-            
-            .pathway-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .action-buttons, .download-buttons {
-                grid-template-columns: 1fr;
-            }
-            
-            .api-key-input {
-                padding-right: 1rem;
-            }
-            
-            .api-key-actions {
-                position: static;
-                transform: none;
-                margin-top: 0.75rem;
-                justify-content: flex-end;
-            }
-            
-            .api-key-input-wrapper {
-                display: flex;
-                flex-direction: column;
-            }
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">🔐 <span>Seven Cubed Seven</span> Labs</div>
-            <div class="tagline">Patent #65 | 2,401 Pathways of Protection</div>
+            <h1>🔐 <span class="gold">Seven Cubed Seven</span> <span class="cyan">Labs</span></h1>
+            <p>Patent #65 | 2,401 Pathways of Protection</p>
         </div>
-        
-        <!-- Status Bar -->
-        <div class="status-bar free" id="statusBar">
-            <div class="tier-badge free" id="tierBadge">
-                <span class="tier-icon">🆓</span>
-                <span id="tierName">Free Tier</span>
+
+        <!-- Tier Status Bar -->
+        <div class="tier-bar" id="tierBar">
+            <div class="tier-info">
+                <span class="tier-icon" id="tierIcon">🆓</span>
+                <span class="tier-name free" id="tierName">Free Tier</span>
             </div>
             <div class="usage-info">
-                <div class="usage-count" id="usageCount">0 / 100</div>
-                <div id="usagePeriod">encryptions today</div>
-                <a href="pricing.html" class="upgrade-link" id="upgradeLink">Upgrade to Starter →</a>
+                <div class="usage-count"><span id="usageCount">0</span> / <span id="usageLimit">100</span></div>
+                <div class="usage-label" id="usageLabel">encryptions today</div>
             </div>
         </div>
-        
-        <!-- Rate Limit Warning -->
-        <div class="rate-limit-warning" id="rateLimitWarning">
-            <h3>⚠️ Daily Limit Reached</h3>
-            <p>You've used all 100 free encryptions for today. Upgrade to Starter for 50,000 encryptions per month!</p>
-            <a href="pricing.html" class="btn btn-primary">Upgrade Now - $29.99/mo</a>
-        </div>
-        
+
         <!-- Main Card -->
         <div class="main-card">
-            <div class="card-header">
-                <h1>🔐 Secure File Encryption</h1>
-                <p>4-Shell Recursive Encryption • 2,401 Unique Pathways</p>
-            </div>
-            
-            <div class="card-body">
+            <div class="main-card-inner">
+                <!-- Card Header -->
+                <div class="card-header">
+                    <h2>🔐 Secure File Encryption</h2>
+                    <p>4-Shell Recursive Encryption • 2,401 Unique Pathways</p>
+                </div>
+
                 <!-- API Key Section -->
                 <div class="api-key-section" id="apiKeySection">
                     <div class="api-key-header">
-                        <div class="api-key-label">
-                            <span class="icon">🔑</span>
-                            API Key (optional)
-                        </div>
+                        <div class="api-key-title">🔑 API Key (optional)</div>
                         <div class="api-key-hint">Leave blank for free tier</div>
                     </div>
-                    <div class="api-key-input-wrapper">
-                        <input 
-                            type="password" 
-                            class="api-key-input" 
-                            id="apiKeyInput" 
-                            placeholder="Paste your API key here..."
-                        >
-                        <div class="api-key-actions">
-                            <button class="btn-small btn-apply" id="applyKeyBtn">Apply</button>
-                            <button class="btn-small btn-clear" id="clearKeyBtn">Clear</button>
-                        </div>
+                    <div class="api-key-input-row">
+                        <input type="password" class="api-key-input" id="apiKeyInput" placeholder="Paste your API key here...">
+                        <button class="btn-small btn-apply" onclick="applyApiKey()">Apply</button>
+                        <button class="btn-small btn-clear" onclick="clearApiKey()">Clear</button>
                     </div>
-                    <div class="api-key-status" id="apiKeyStatus"></div>
-                    <div class="api-key-footer">
-                        Don't have an API key? <a href="pricing.html">Get Starter Plan</a> for 50,000 encryptions/month
+                    <div class="key-status" id="keyStatus"></div>
+                    <div class="upgrade-link">
+                        Don't have an API key? <a href="https://sevencubedsevenlabs.com/pricing.html" target="_blank">Get Starter Plan</a> for 50,000 encryptions/month
                     </div>
                 </div>
-                
+
                 <!-- Drop Zone -->
-                <div class="drop-zone" id="dropZone">
+                <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
                     <div class="drop-zone-icon">📁</div>
-                    <div class="drop-zone-text">Drag & drop a file here</div>
-                    <div class="drop-zone-hint">or click to browse • Max 10MB</div>
-                    <input type="file" class="file-input" id="fileInput">
+                    <div class="drop-zone-text">Drag & drop files here</div>
+                    <div class="drop-zone-hint">or click to browse • Max 10MB per file • <span class="batch-hint">Multiple files supported!</span></div>
                 </div>
-                
-                <!-- File Info -->
-                <div class="file-info" id="fileInfo">
-                    <div class="file-icon">📄</div>
-                    <div class="file-details">
-                        <div class="file-name" id="fileName">document.pdf</div>
-                        <div class="file-size" id="fileSize">1.2 MB</div>
+                <input type="file" id="fileInput" multiple>
+
+                <!-- File Queue -->
+                <div class="file-queue" id="fileQueue" style="display: none;">
+                    <div class="file-queue-header">
+                        <div class="file-queue-title">
+                            📋 Files to Encrypt
+                            <span class="file-count" id="fileCount">0</span>
+                        </div>
+                        <button class="btn-clear-all" onclick="clearAllFiles()">Clear All</button>
                     </div>
-                    <button class="file-remove" id="removeFile">×</button>
+                    <div class="file-list" id="fileList"></div>
                 </div>
-                
-                <!-- Pathway Selector -->
+
+                <!-- Pathway Section -->
                 <div class="pathway-section">
                     <div class="pathway-header">
-                        <div class="pathway-label">
-                            <span>🛤️</span>
-                            Select Pathway
-                        </div>
-                        <div class="pathway-presets">
-                            <button class="preset-btn" data-pathway="3,3,3,3">Standard</button>
-                            <button class="preset-btn" data-pathway="5,2,1,4">Financial</button>
-                            <button class="preset-btn" data-pathway="7,7,7,7">Maximum</button>
+                        <div class="pathway-title">🎯 Select Pathway</div>
+                        <div class="preset-buttons">
+                            <button class="preset-btn active" onclick="setPreset('standard')">Standard</button>
+                            <button class="preset-btn" onclick="setPreset('financial')">Financial</button>
+                            <button class="preset-btn" onclick="setPreset('maximum')">Maximum</button>
                         </div>
                     </div>
-                    <div class="pathway-grid">
-                        <div class="shell-selector">
+                    <div class="shell-grid">
+                        <div class="shell-item">
                             <div class="shell-label">Shell 1</div>
-                            <select class="shell-select" id="shell1">
+                            <select class="shell-select" id="shell1" onchange="updatePathwayDisplay()">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3" selected>3</option>
@@ -881,9 +826,9 @@
                                 <option value="7">7</option>
                             </select>
                         </div>
-                        <div class="shell-selector">
+                        <div class="shell-item">
                             <div class="shell-label">Shell 2</div>
-                            <select class="shell-select" id="shell2">
+                            <select class="shell-select" id="shell2" onchange="updatePathwayDisplay()">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3" selected>3</option>
@@ -893,9 +838,9 @@
                                 <option value="7">7</option>
                             </select>
                         </div>
-                        <div class="shell-selector">
+                        <div class="shell-item">
                             <div class="shell-label">Shell 3</div>
-                            <select class="shell-select" id="shell3">
+                            <select class="shell-select" id="shell3" onchange="updatePathwayDisplay()">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3" selected>3</option>
@@ -905,9 +850,9 @@
                                 <option value="7">7</option>
                             </select>
                         </div>
-                        <div class="shell-selector">
+                        <div class="shell-item">
                             <div class="shell-label">Shell 4</div>
-                            <select class="shell-select" id="shell4">
+                            <select class="shell-select" id="shell4" onchange="updatePathwayDisplay()">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3" selected>3</option>
@@ -918,68 +863,48 @@
                             </select>
                         </div>
                     </div>
-                    <div class="pathway-display">
-                        Pathway: [<span id="pathwayDisplay">3, 3, 3, 3</span>]
+                    <div class="pathway-display">Pathway: [<span id="pathwayDisplay">3, 3, 3, 3</span>]</div>
+                </div>
+
+                <!-- Batch Progress -->
+                <div class="batch-progress" id="batchProgress">
+                    <div class="batch-progress-header">
+                        <div class="batch-progress-text">🔄 Encrypting files...</div>
+                        <div class="batch-progress-count"><span id="progressCurrent">0</span> / <span id="progressTotal">0</span></div>
+                    </div>
+                    <div class="batch-progress-bar">
+                        <div class="batch-progress-fill" id="progressFill"></div>
                     </div>
                 </div>
-                
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="encryptBtn" disabled>
-                        <span>🔒</span> Encrypt File
-                    </button>
-                    <button class="btn btn-secondary" id="decryptBtn" disabled>
-                        <span>🔓</span> Decrypt File
-                    </button>
-                </div>
-                
+
                 <!-- Results Section -->
                 <div class="results-section" id="resultsSection">
-                    <div class="result-card">
-                        <div class="result-header">
-                            <span class="result-icon">✅</span>
-                            <span class="result-title">Encryption Successful</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Original Size</span>
-                            <span class="result-value" id="resultOriginalSize">-</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Encrypted Size</span>
-                            <span class="result-value" id="resultEncryptedSize">-</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Pathway Used</span>
-                            <span class="result-value" id="resultPathway">-</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Encryption Time</span>
-                            <span class="result-value" id="resultTime">-</span>
-                        </div>
-                        
-                        <div class="download-buttons">
-                            <button class="btn-download encrypted" id="downloadEncrypted">
-                                📄 Download .encrypted
-                            </button>
-                            <button class="btn-download key" id="downloadKey">
-                                🔑 Download .key
-                            </button>
-                        </div>
-                        
-                        <div class="warning-banner">
-                            <span class="icon">⚠️</span>
-                            <div class="text">
-                                <strong>IMPORTANT:</strong> Download BOTH files! You need the .encrypted file AND the .key file to decrypt your data. Store them in different locations for maximum security.
-                            </div>
-                        </div>
+                    <div class="results-header">
+                        <div class="results-title">✅ Encryption Complete!</div>
+                        <button class="btn-download-all" onclick="downloadAllAsZip()">
+                            📦 Download All (ZIP)
+                        </button>
                     </div>
+                    <div class="results-summary" id="resultsSummary">
+                        0 files encrypted successfully
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-encrypt" id="encryptBtn" onclick="encryptAllFiles()" disabled>
+                        🔒 Encrypt Files
+                    </button>
+                    <button class="btn btn-download" id="downloadBtn" onclick="downloadAllAsZip()" disabled>
+                        📦 Download ZIP
+                    </button>
                 </div>
             </div>
         </div>
-        
+
         <!-- Footer -->
         <div class="footer">
-            <p>🔐 Patent #65 | Seven Cubed Seven Labs LLC | 7³ × 7 = 2,401</p>
+            <div class="footer-brand">🔐 Patent #65 | Seven Cubed Seven Labs LLC | 7³ × 7 = 2,401</div>
             <div class="footer-links">
                 <a href="https://sevencubedsevenlabs.com">Home</a>
                 <a href="https://sevencubedsevenlabs.com/pricing.html">Pricing</a>
@@ -990,545 +915,472 @@
             </div>
         </div>
     </div>
-    
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Encrypting through 4 shells...</div>
-        </div>
-    </div>
-    
+
     <script>
-        // ============================================
-        // CONFIGURATION
-        // ============================================
+        // Configuration
         const API_BASE = 'https://api.sevencubedsevenlabs.com';
-        const STORAGE_KEY_API = 'patent65_api_key';
-        const STORAGE_KEY_USAGE = 'patent65_usage';
-        
-        // ============================================
-        // STATE
-        // ============================================
-        let currentFile = null;
-        let currentApiKey = null;
-        let encryptedData = null;
-        let keyData = null;
-        let userTier = 'free';
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        const STORAGE_KEY = 'patent65_api_key';
+
+        // State
+        let currentApiKey = localStorage.getItem(STORAGE_KEY) || '';
+        let currentTier = 'free';
         let usageCount = 0;
-        let usageLimit = 100;
-        
-        // ============================================
-        // DOM ELEMENTS
-        // ============================================
-        const elements = {
-            statusBar: document.getElementById('statusBar'),
-            tierBadge: document.getElementById('tierBadge'),
-            tierName: document.getElementById('tierName'),
-            usageCount: document.getElementById('usageCount'),
-            usagePeriod: document.getElementById('usagePeriod'),
-            upgradeLink: document.getElementById('upgradeLink'),
-            rateLimitWarning: document.getElementById('rateLimitWarning'),
-            apiKeySection: document.getElementById('apiKeySection'),
-            apiKeyInput: document.getElementById('apiKeyInput'),
-            apiKeyStatus: document.getElementById('apiKeyStatus'),
-            applyKeyBtn: document.getElementById('applyKeyBtn'),
-            clearKeyBtn: document.getElementById('clearKeyBtn'),
-            dropZone: document.getElementById('dropZone'),
-            fileInput: document.getElementById('fileInput'),
-            fileInfo: document.getElementById('fileInfo'),
-            fileName: document.getElementById('fileName'),
-            fileSize: document.getElementById('fileSize'),
-            removeFile: document.getElementById('removeFile'),
-            shell1: document.getElementById('shell1'),
-            shell2: document.getElementById('shell2'),
-            shell3: document.getElementById('shell3'),
-            shell4: document.getElementById('shell4'),
-            pathwayDisplay: document.getElementById('pathwayDisplay'),
-            encryptBtn: document.getElementById('encryptBtn'),
-            decryptBtn: document.getElementById('decryptBtn'),
-            resultsSection: document.getElementById('resultsSection'),
-            resultOriginalSize: document.getElementById('resultOriginalSize'),
-            resultEncryptedSize: document.getElementById('resultEncryptedSize'),
-            resultPathway: document.getElementById('resultPathway'),
-            resultTime: document.getElementById('resultTime'),
-            downloadEncrypted: document.getElementById('downloadEncrypted'),
-            downloadKey: document.getElementById('downloadKey'),
-            loadingOverlay: document.getElementById('loadingOverlay')
-        };
-        
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        function init() {
-            // Load saved API key
-            const savedKey = localStorage.getItem(STORAGE_KEY_API);
-            if (savedKey) {
-                elements.apiKeyInput.value = savedKey;
-                validateAndApplyKey(savedKey);
-            } else {
-                loadFreeUsage();
+        let filesToEncrypt = [];
+        let encryptedResults = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDropZone();
+            setupFileInput();
+            if (currentApiKey) {
+                document.getElementById('apiKeyInput').value = currentApiKey;
+                validateApiKey(currentApiKey);
             }
-            
-            // Event Listeners
-            setupEventListeners();
             updatePathwayDisplay();
-        }
-        
-        function setupEventListeners() {
-            // API Key
-            elements.applyKeyBtn.addEventListener('click', () => {
-                const key = elements.apiKeyInput.value.trim();
-                validateAndApplyKey(key);
-            });
-            
-            elements.clearKeyBtn.addEventListener('click', clearApiKey);
-            
-            elements.apiKeyInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const key = elements.apiKeyInput.value.trim();
-                    validateAndApplyKey(key);
-                }
-            });
-            
-            // Drop Zone
-            elements.dropZone.addEventListener('click', () => elements.fileInput.click());
-            elements.dropZone.addEventListener('dragover', handleDragOver);
-            elements.dropZone.addEventListener('dragleave', handleDragLeave);
-            elements.dropZone.addEventListener('drop', handleDrop);
-            elements.fileInput.addEventListener('change', handleFileSelect);
-            elements.removeFile.addEventListener('click', removeFile);
-            
-            // Pathway
-            document.querySelectorAll('.shell-select').forEach(select => {
-                select.addEventListener('change', updatePathwayDisplay);
-            });
-            
-            document.querySelectorAll('.preset-btn').forEach(btn => {
-                btn.addEventListener('click', () => applyPreset(btn.dataset.pathway));
-            });
-            
-            // Actions
-            elements.encryptBtn.addEventListener('click', encryptFile);
-            elements.decryptBtn.addEventListener('click', decryptFile);
-            elements.downloadEncrypted.addEventListener('click', downloadEncryptedFile);
-            elements.downloadKey.addEventListener('click', downloadKeyFile);
-        }
-        
-        // ============================================
-        // API KEY MANAGEMENT
-        // ============================================
-        async function validateAndApplyKey(key) {
-    if (!key) {
-        clearApiKey();
-        return;
-    }
-    
-    // Basic format validation (64 hex chars)
-    if (!/^[a-f0-9]{64}$/i.test(key)) {
-        showKeyStatus('invalid', '❌ Invalid key format (expected 64 hex characters)');
-        return;
-    }
-    
-    // Validate against server to get actual tier
-    try {
-        const response = await fetch(`${API_BASE}/validate-key`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ api_key: key })
         });
-        
-        const result = await response.json();
-        
-        if (result.valid) {
-            currentApiKey = key;
-            localStorage.setItem(STORAGE_KEY_API, key);
-            
-            // Set the ACTUAL tier from server
-            setTier(result.tier);
-            showKeyStatus('valid', `✅ API key applied - ${result.tier.charAt(0).toUpperCase() + result.tier.slice(1)} Plan active`);
-            elements.apiKeySection.classList.add('has-key');
-            
-            // Update usage from server response
+
+        // Drop Zone Setup
+        function setupDropZone() {
+            const dropZone = document.getElementById('dropZone');
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                handleFiles(e.dataTransfer.files);
+            });
+        }
+
+        // File Input Setup
+        function setupFileInput() {
+            const fileInput = document.getElementById('fileInput');
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+                e.target.value = ''; // Reset for same file selection
+            });
+        }
+
+        // Handle Files
+        function handleFiles(files) {
+            for (const file of files) {
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`File "${file.name}" exceeds 10MB limit`);
+                    continue;
+                }
+
+                // Check if file already in queue
+                if (filesToEncrypt.some(f => f.name === file.name && f.size === file.size)) {
+                    continue;
+                }
+
+                filesToEncrypt.push({
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    status: 'pending',
+                    progress: 0,
+                    result: null
+                });
+            }
+
+            updateFileQueue();
+            updateEncryptButton();
+        }
+
+        // Update File Queue UI
+        function updateFileQueue() {
+            const queueEl = document.getElementById('fileQueue');
+            const listEl = document.getElementById('fileList');
+            const countEl = document.getElementById('fileCount');
+
+            if (filesToEncrypt.length === 0) {
+                queueEl.style.display = 'none';
+                return;
+            }
+
+            queueEl.style.display = 'block';
+            countEl.textContent = filesToEncrypt.length;
+
+            listEl.innerHTML = filesToEncrypt.map((item, index) => `
+                <div class="file-item" id="file-${index}">
+                    <div class="file-icon">📄</div>
+                    <div class="file-details">
+                        <div class="file-name">${escapeHtml(item.name)}</div>
+                        <div class="file-size">${formatFileSize(item.size)}</div>
+                    </div>
+                    <div class="file-status">
+                        <span class="status-icon ${item.status}">${getStatusIcon(item.status)}</span>
+                        <div class="file-progress">
+                            <div class="file-progress-bar" style="width: ${item.progress}%"></div>
+                        </div>
+                    </div>
+                    <button class="file-remove" onclick="removeFile(${index})" ${item.status === 'encrypting' ? 'disabled' : ''}>×</button>
+                </div>
+            `).join('');
+        }
+
+        // Get Status Icon
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'pending': return '⏳';
+                case 'encrypting': return '🔄';
+                case 'done': return '✅';
+                case 'error': return '❌';
+                default: return '⏳';
+            }
+        }
+
+        // Remove File
+        function removeFile(index) {
+            filesToEncrypt.splice(index, 1);
+            updateFileQueue();
+            updateEncryptButton();
+        }
+
+        // Clear All Files
+        function clearAllFiles() {
+            filesToEncrypt = [];
+            encryptedResults = [];
+            updateFileQueue();
+            updateEncryptButton();
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('batchProgress').classList.remove('active');
+        }
+
+        // Update Encrypt Button State
+        function updateEncryptButton() {
+            const btn = document.getElementById('encryptBtn');
+            const pendingFiles = filesToEncrypt.filter(f => f.status === 'pending').length;
+            btn.disabled = pendingFiles === 0;
+            btn.textContent = pendingFiles > 0 ? `🔒 Encrypt ${pendingFiles} File${pendingFiles > 1 ? 's' : ''}` : '🔒 Encrypt Files';
+        }
+
+        // Encrypt All Files
+        async function encryptAllFiles() {
+            const pendingFiles = filesToEncrypt.filter(f => f.status === 'pending');
+            if (pendingFiles.length === 0) return;
+
+            const pathway = getPathway();
+            encryptedResults = [];
+
+            // Show progress
+            document.getElementById('batchProgress').classList.add('active');
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('encryptBtn').disabled = true;
+            document.getElementById('progressTotal').textContent = pendingFiles.length;
+
+            for (let i = 0; i < filesToEncrypt.length; i++) {
+                const item = filesToEncrypt[i];
+                if (item.status !== 'pending') continue;
+
+                // Update progress
+                document.getElementById('progressCurrent').textContent = encryptedResults.length + 1;
+                document.getElementById('progressFill').style.width = `${((encryptedResults.length) / pendingFiles.length) * 100}%`;
+
+                // Update file status
+                item.status = 'encrypting';
+                item.progress = 50;
+                updateFileQueue();
+
+                try {
+                    const result = await encryptFile(item.file, pathway);
+                    item.status = 'done';
+                    item.progress = 100;
+                    item.result = result;
+                    encryptedResults.push({
+                        name: item.name,
+                        ...result
+                    });
+                } catch (error) {
+                    item.status = 'error';
+                    item.progress = 0;
+                    console.error(`Error encrypting ${item.name}:`, error);
+                }
+
+                updateFileQueue();
+            }
+
+            // Complete
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressCurrent').textContent = pendingFiles.length;
+
+            // Show results
+            setTimeout(() => {
+                document.getElementById('batchProgress').classList.remove('active');
+                if (encryptedResults.length > 0) {
+                    document.getElementById('resultsSection').classList.add('active');
+                    document.getElementById('resultsSummary').textContent = 
+                        `${encryptedResults.length} file${encryptedResults.length > 1 ? 's' : ''} encrypted successfully with pathway [${pathway.join(', ')}]`;
+                    document.getElementById('downloadBtn').disabled = false;
+                }
+            }, 500);
+
+            updateEncryptButton();
+        }
+
+        // Encrypt Single File
+        async function encryptFile(file, pathway) {
+            // Read file as base64
+            const base64 = await fileToBase64(file);
+
+            const response = await fetch(`${API_BASE}/encrypt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(currentApiKey && { 'X-API-Key': currentApiKey })
+                },
+                body: JSON.stringify({
+                    plaintext: base64,
+                    pathway: pathway
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Encryption failed');
+            }
+
+            const result = await response.json();
+
+            // Update usage
             if (result.usage) {
                 usageCount = result.usage.current;
-                updateUsageDisplay();
+                document.getElementById('usageCount').textContent = usageCount;
             }
-        } else {
-            showKeyStatus('invalid', '❌ ' + result.message);
+
+            return {
+                ciphertext: result.ciphertext,
+                key: result.key,
+                pathway: result.pathway_used
+            };
         }
-    } catch (error) {
-        // If server validation fails, fall back to format-only check
-        console.warn('Server validation failed, using format check only:', error);
-        currentApiKey = key;
-        localStorage.setItem(STORAGE_KEY_API, key);
-        setTier('starter');
-        showKeyStatus('valid', '✅ API key applied - Starter Plan active');
-        elements.apiKeySection.classList.add('has-key');
-    }
-}
-        
-        function clearApiKey() {
-            currentApiKey = null;
-            localStorage.removeItem(STORAGE_KEY_API);
-            elements.apiKeyInput.value = '';
-            elements.apiKeySection.classList.remove('has-key');
-            elements.apiKeyStatus.innerHTML = '';
-            setTier('free');
-            loadFreeUsage();
-        }
-        
-        function showKeyStatus(type, message) {
-            elements.apiKeyStatus.className = 'api-key-status ' + type;
-            elements.apiKeyStatus.innerHTML = message;
-        }
-        
-        // ============================================
-        // TIER & USAGE MANAGEMENT
-        // ============================================
-        function setTier(tier) {
-            userTier = tier;
-            
-            // Update status bar
-            elements.statusBar.className = 'status-bar ' + tier;
-            elements.tierBadge.className = 'tier-badge ' + tier;
-            
-            if (tier === 'free') {
-                elements.tierBadge.querySelector('.tier-icon').textContent = '🆓';
-                elements.tierName.textContent = 'Free Tier';
-                elements.usagePeriod.textContent = 'encryptions today';
-                elements.upgradeLink.style.display = 'inline';
-                usageLimit = 100;
-            } else if (tier === 'starter') {
-                elements.tierBadge.querySelector('.tier-icon').textContent = '⭐';
-                elements.tierName.textContent = 'Starter Plan';
-                elements.usagePeriod.textContent = 'encryptions this month';
-                elements.upgradeLink.style.display = 'none';
-                usageLimit = 50000;
-                usageCount = 0; // Reset for demo, in production fetch from server
-            } else if (tier === 'enterprise') {
-                elements.tierBadge.querySelector('.tier-icon').textContent = '🏢';
-                elements.tierName.textContent = 'Enterprise';
-                elements.usagePeriod.textContent = 'unlimited';
-                elements.upgradeLink.style.display = 'none';
-                usageLimit = Infinity;
-            }
-            
-            updateUsageDisplay();
-        }
-        
-        function loadFreeUsage() {
-            // Load today's usage from localStorage
-            const today = new Date().toDateString();
-            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_USAGE) || '{}');
-            
-            if (saved.date === today) {
-                usageCount = saved.count || 0;
-            } else {
-                // New day, reset count
-                usageCount = 0;
-                saveFreeUsage();
-            }
-            
-            updateUsageDisplay();
-            checkRateLimit();
-        }
-        
-        function saveFreeUsage() {
-            const today = new Date().toDateString();
-            localStorage.setItem(STORAGE_KEY_USAGE, JSON.stringify({
-                date: today,
-                count: usageCount
-            }));
-        }
-        
-        function incrementUsage() {
-            usageCount++;
-            if (userTier === 'free') {
-                saveFreeUsage();
-            }
-            updateUsageDisplay();
-            checkRateLimit();
-        }
-        
-        function updateUsageDisplay() {
-            if (userTier === 'enterprise') {
-                elements.usageCount.textContent = usageCount + ' / ∞';
-            } else {
-                elements.usageCount.textContent = usageCount + ' / ' + usageLimit.toLocaleString();
-            }
-        }
-        
-        function checkRateLimit() {
-            if (userTier === 'free' && usageCount >= usageLimit) {
-                elements.rateLimitWarning.classList.add('visible');
-                elements.encryptBtn.disabled = true;
-            } else {
-                elements.rateLimitWarning.classList.remove('visible');
-                updateButtonState();
-            }
-        }
-        
-        // ============================================
-        // FILE HANDLING
-        // ============================================
-        function handleDragOver(e) {
-            e.preventDefault();
-            elements.dropZone.classList.add('dragover');
-        }
-        
-        function handleDragLeave(e) {
-            e.preventDefault();
-            elements.dropZone.classList.remove('dragover');
-        }
-        
-        function handleDrop(e) {
-            e.preventDefault();
-            elements.dropZone.classList.remove('dragover');
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                processFile(files[0]);
-            }
-        }
-        
-        function handleFileSelect(e) {
-            const files = e.target.files;
-            if (files.length > 0) {
-                processFile(files[0]);
-            }
-        }
-        
-        function processFile(file) {
-            // Check file size (10MB max)
-            if (file.size > 10 * 1024 * 1024) {
-                alert('File too large. Maximum size is 10MB.');
-                return;
-            }
-            
-            currentFile = file;
-            elements.fileName.textContent = file.name;
-            elements.fileSize.textContent = formatFileSize(file.size);
-            elements.fileInfo.classList.add('visible');
-            elements.dropZone.style.display = 'none';
-            
-            // Check if it's an encrypted file (for decryption)
-            if (file.name.endsWith('.encrypted')) {
-                elements.decryptBtn.disabled = false;
-                elements.encryptBtn.disabled = true;
-            } else {
-                elements.encryptBtn.disabled = false;
-                elements.decryptBtn.disabled = true;
-            }
-            
-            // Hide previous results
-            elements.resultsSection.classList.remove('visible');
-        }
-        
-        function removeFile() {
-            currentFile = null;
-            elements.fileInfo.classList.remove('visible');
-            elements.dropZone.style.display = 'block';
-            elements.fileInput.value = '';
-            elements.encryptBtn.disabled = true;
-            elements.decryptBtn.disabled = true;
-            elements.resultsSection.classList.remove('visible');
-        }
-        
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-        }
-        
-        function updateButtonState() {
-            if (!currentFile) {
-                elements.encryptBtn.disabled = true;
-                elements.decryptBtn.disabled = true;
-                return;
-            }
-            
-            if (currentFile.name.endsWith('.encrypted')) {
-                elements.decryptBtn.disabled = false;
-                elements.encryptBtn.disabled = true;
-            } else {
-                elements.encryptBtn.disabled = userTier === 'free' && usageCount >= usageLimit;
-                elements.decryptBtn.disabled = true;
-            }
-        }
-        
-        // ============================================
-        // PATHWAY MANAGEMENT
-        // ============================================
-        function updatePathwayDisplay() {
-            const pathway = getPathway();
-            elements.pathwayDisplay.textContent = pathway.join(', ');
-            
-            // Update preset buttons
-            const pathwayStr = pathway.join(',');
-            document.querySelectorAll('.preset-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.pathway === pathwayStr);
-            });
-        }
-        
-        function getPathway() {
-            return [
-                parseInt(elements.shell1.value),
-                parseInt(elements.shell2.value),
-                parseInt(elements.shell3.value),
-                parseInt(elements.shell4.value)
-            ];
-        }
-        
-        function applyPreset(pathwayStr) {
-            const [s1, s2, s3, s4] = pathwayStr.split(',');
-            elements.shell1.value = s1;
-            elements.shell2.value = s2;
-            elements.shell3.value = s3;
-            elements.shell4.value = s4;
-            updatePathwayDisplay();
-        }
-        
-        // ============================================
-        // ENCRYPTION
-        // ============================================
-        async function encryptFile() {
-            if (!currentFile) return;
-            
-            // Check rate limit
-            if (userTier === 'free' && usageCount >= usageLimit) {
-                checkRateLimit();
-                return;
-            }
-            
-            showLoading(true);
-            
-            try {
-                // Read file as base64
-                const fileData = await readFileAsBase64(currentFile);
-                const pathway = getPathway();
-                
-                // Prepare headers
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-                
-                if (currentApiKey) {
-                    headers['X-API-Key'] = currentApiKey;
-                }
-                
-                // Call API
-                const response = await fetch(`${API_BASE}/encrypt`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({
-                        plaintext: fileData,
-                        pathway: pathway
-                    })
-                });
-                
-                if (response.status === 429) {
-                    throw new Error('Rate limit exceeded. Please upgrade to Starter for more encryptions.');
-                }
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.detail || 'Encryption failed');
-                }
-                
-                const result = await response.json();
-                
-                // Store results
-                encryptedData = {
-                    ciphertext: result.ciphertext,
-                    filename: currentFile.name
-                };
-                
-                keyData = {
-                    key: result.key,
-                    pathway: result.pathway_used,
-                    filename: currentFile.name,
-                    encrypted_at: new Date().toISOString()
-                };
-                
-                // Update usage
-                incrementUsage();
-                
-                // Show results
-                elements.resultOriginalSize.textContent = formatFileSize(currentFile.size);
-                elements.resultEncryptedSize.textContent = formatFileSize(result.ciphertext.length);
-                elements.resultPathway.textContent = '[' + result.pathway_used.join(', ') + ']';
-                elements.resultTime.textContent = result.encryption_time_ms.toFixed(2) + ' ms';
-                elements.resultsSection.classList.add('visible');
-                
-            } catch (error) {
-                alert('Error: ' + error.message);
-            } finally {
-                showLoading(false);
-            }
-        }
-        
-        async function decryptFile() {
-            // For decryption, user needs to also provide the .key file
-            // This is a simplified demo - in production you'd have file pairing
-            alert('To decrypt, you need both the .encrypted file and the .key file.\n\nPlease use the API directly or contact support for assistance.');
-        }
-        
-        function readFileAsBase64(file) {
+
+        // File to Base64
+        function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = () => {
-                    // Get base64 part after data URL prefix
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
+                reader.onload = () => resolve(reader.result.split(',')[1] || reader.result);
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
         }
-        
-        // ============================================
-        // DOWNLOADS
-        // ============================================
-        function downloadEncryptedFile() {
-            if (!encryptedData) return;
-            
-            const blob = new Blob([encryptedData.ciphertext], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
+
+        // Download All as ZIP
+        async function downloadAllAsZip() {
+            if (encryptedResults.length === 0) return;
+
+            const zip = new JSZip();
+            const pathway = getPathway();
+            const timestamp = new Date().toISOString().slice(0, 10);
+
+            // Create folders
+            const encryptedFolder = zip.folder('encrypted_files');
+            const keysFolder = zip.folder('keys');
+
+            // Add files
+            for (const result of encryptedResults) {
+                const baseName = result.name.replace(/\.[^/.]+$/, '');
+                
+                // Add encrypted file
+                encryptedFolder.file(`${result.name}.encrypted`, result.ciphertext);
+                
+                // Add key file
+                keysFolder.file(`${result.name}.key`, result.key);
+            }
+
+            // Add manifest
+            const manifest = {
+                generated: new Date().toISOString(),
+                pathway: pathway,
+                files: encryptedResults.map(r => ({
+                    original: r.name,
+                    encrypted: `${r.name}.encrypted`,
+                    key: `${r.name}.key`
+                })),
+                note: "IMPORTANT: You need BOTH the .encrypted file AND the .key file (plus the pathway) to decrypt!",
+                api: "https://api.sevencubedsevenlabs.com",
+                company: "Seven Cubed Seven Labs LLC",
+                patent: "Patent #65 - 2,401 Pathways"
+            };
+            zip.file('manifest.json', JSON.stringify(manifest, null, 2));
+
+            // Add README
+            const readme = `# Patent #65 Encrypted Files
+Generated: ${new Date().toISOString()}
+Pathway: [${pathway.join(', ')}]
+
+## Contents
+- /encrypted_files/ - Your encrypted files
+- /keys/ - Decryption keys (KEEP SECURE!)
+- manifest.json - File mapping and metadata
+
+## IMPORTANT: The Golden Rule
+To decrypt ANY file, you need ALL THREE:
+1. The .encrypted file
+2. The .key file  
+3. The pathway: [${pathway.join(', ')}]
+
+Store encrypted files and keys in DIFFERENT locations!
+
+## To Decrypt
+Visit: https://secure.sevencubedsevenlabs.com
+
+## Support
+Email: 7cubed7@proton.me
+Docs: https://api.sevencubedsevenlabs.com/docs
+
+---
+Seven Cubed Seven Labs LLC
+Patent #65: Recursive 7⁴-Lattice Cryptographic Shell System
+7³ × 7 = 2,401 Pathways of Protection
+`;
+            zip.file('README.txt', readme);
+
+            // Generate and download
+            const content = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(content);
             const a = document.createElement('a');
             a.href = url;
-            a.download = encryptedData.filename + '.encrypted';
-            document.body.appendChild(a);
+            a.download = `patent65_encrypted_${timestamp}.zip`;
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
-        
-        function downloadKeyFile() {
-            if (!keyData) return;
-            
-            const blob = new Blob([JSON.stringify(keyData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = keyData.filename + '.key';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+
+        // API Key Functions
+        async function applyApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (!key) {
+                clearApiKey();
+                return;
+            }
+            await validateApiKey(key);
         }
-        
-        // ============================================
-        // UI HELPERS
-        // ============================================
-        function showLoading(show) {
-            elements.loadingOverlay.classList.toggle('visible', show);
+
+        async function validateApiKey(key) {
+            try {
+                const response = await fetch(`${API_BASE}/validate-key`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_key: key })
+                });
+
+                const result = await response.json();
+
+                if (result.valid) {
+                    currentApiKey = key;
+                    localStorage.setItem(STORAGE_KEY, key);
+                    currentTier = result.tier;
+                    updateTierDisplay(result.tier, result.usage);
+                    document.getElementById('keyStatus').textContent = `✅ API key applied - ${result.tier.charAt(0).toUpperCase() + result.tier.slice(1)} Plan active`;
+                    document.getElementById('keyStatus').className = 'key-status valid';
+                } else {
+                    document.getElementById('keyStatus').textContent = '❌ ' + result.message;
+                    document.getElementById('keyStatus').className = 'key-status invalid';
+                }
+            } catch (error) {
+                document.getElementById('keyStatus').textContent = '❌ Could not validate key';
+                document.getElementById('keyStatus').className = 'key-status invalid';
+            }
         }
-        
-        // ============================================
-        // START
-        // ============================================
-        init();
+
+        function clearApiKey() {
+            currentApiKey = '';
+            localStorage.removeItem(STORAGE_KEY);
+            document.getElementById('apiKeyInput').value = '';
+            document.getElementById('keyStatus').textContent = '';
+            updateTierDisplay('free', null);
+        }
+
+        function updateTierDisplay(tier, usage) {
+            const tierBar = document.getElementById('tierBar');
+            const tierIcon = document.getElementById('tierIcon');
+            const tierName = document.getElementById('tierName');
+            const usageCountEl = document.getElementById('usageCount');
+            const usageLimitEl = document.getElementById('usageLimit');
+            const usageLabel = document.getElementById('usageLabel');
+
+            tierBar.className = 'tier-bar ' + tier;
+            tierName.className = 'tier-name ' + tier;
+
+            if (tier === 'enterprise') {
+                tierIcon.textContent = '🏢';
+                tierName.textContent = 'Enterprise';
+                usageCountEl.textContent = usage?.current || 0;
+                usageLimitEl.textContent = '∞';
+                usageLabel.textContent = 'unlimited';
+            } else if (tier === 'starter') {
+                tierIcon.textContent = '⭐';
+                tierName.textContent = 'Starter Plan';
+                usageCountEl.textContent = usage?.current || 0;
+                usageLimitEl.textContent = '50,000';
+                usageLabel.textContent = 'encryptions this month';
+            } else {
+                tierIcon.textContent = '🆓';
+                tierName.textContent = 'Free Tier';
+                usageCountEl.textContent = usage?.current || 0;
+                usageLimitEl.textContent = '100';
+                usageLabel.textContent = 'encryptions today';
+            }
+
+            usageCount = usage?.current || 0;
+        }
+
+        // Pathway Functions
+        function getPathway() {
+            return [
+                parseInt(document.getElementById('shell1').value),
+                parseInt(document.getElementById('shell2').value),
+                parseInt(document.getElementById('shell3').value),
+                parseInt(document.getElementById('shell4').value)
+            ];
+        }
+
+        function setPreset(preset) {
+            const presets = {
+                standard: [3, 3, 3, 3],
+                financial: [5, 2, 1, 4],
+                maximum: [7, 7, 7, 7]
+            };
+
+            const pathway = presets[preset];
+            document.getElementById('shell1').value = pathway[0];
+            document.getElementById('shell2').value = pathway[1];
+            document.getElementById('shell3').value = pathway[2];
+            document.getElementById('shell4').value = pathway[3];
+
+            // Update active button
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            updatePathwayDisplay();
+        }
+
+        function updatePathwayDisplay() {
+            const pathway = getPathway();
+            document.getElementById('pathwayDisplay').textContent = pathway.join(', ');
+        }
+
+        // Utilities
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
     </script>
 </body>
 </html>
