@@ -787,7 +787,7 @@
                 <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
                     <div class="drop-zone-icon">📁</div>
                     <div class="drop-zone-text">Drag & drop files here</div>
-                    <div class="drop-zone-hint">or click to browse • Max 10MB per file • <span class="batch-hint">Multiple files supported!</span></div>
+                    <div class="drop-zone-hint">or click to browse • Max <span id="maxFileSizeDisplay">10MB</span> per file • <span class="batch-hint">Multiple files supported!</span></div>
                 </div>
                 <input type="file" id="fileInput" multiple>
 
@@ -919,8 +919,14 @@
     <script>
         // Configuration
         const API_BASE = 'https://api.sevencubedsevenlabs.com';
-        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
         const STORAGE_KEY = 'patent65_api_key';
+        
+        // Tiered file size limits
+        const FILE_SIZE_LIMITS = {
+            free: 10 * 1024 * 1024,        // 10MB - try it out
+            starter: 50 * 1024 * 1024,     // 50MB - business ready
+            enterprise: 100 * 1024 * 1024  // 100MB - unlimited power!
+        };
 
         // State
         let currentApiKey = localStorage.getItem(STORAGE_KEY) || '';
@@ -928,6 +934,15 @@
         let usageCount = 0;
         let filesToEncrypt = [];
         let encryptedResults = [];
+        
+        // Get current file size limit based on tier
+        function getMaxFileSize() {
+            return FILE_SIZE_LIMITS[currentTier] || FILE_SIZE_LIMITS.free;
+        }
+        
+        function getMaxFileSizeMB() {
+            return Math.round(getMaxFileSize() / (1024 * 1024));
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -971,9 +986,18 @@
 
         // Handle Files
         function handleFiles(files) {
+            const maxSize = getMaxFileSize();
+            const maxSizeMB = getMaxFileSizeMB();
+            
             for (const file of files) {
-                if (file.size > MAX_FILE_SIZE) {
-                    alert(`File "${file.name}" exceeds 10MB limit`);
+                if (file.size > maxSize) {
+                    if (currentTier === 'free') {
+                        alert(`File "${file.name}" exceeds ${maxSizeMB}MB limit.\n\nUpgrade to Starter for 50MB or Enterprise for 100MB files!`);
+                    } else if (currentTier === 'starter') {
+                        alert(`File "${file.name}" exceeds ${maxSizeMB}MB limit.\n\nUpgrade to Enterprise for 100MB files!`);
+                    } else {
+                        alert(`File "${file.name}" exceeds ${maxSizeMB}MB limit.`);
+                    }
                     continue;
                 }
 
@@ -1294,6 +1318,7 @@ Patent #65: Recursive 7⁴-Lattice Cryptographic Shell System
 
         function clearApiKey() {
             currentApiKey = '';
+            currentTier = 'free';
             localStorage.removeItem(STORAGE_KEY);
             document.getElementById('apiKeyInput').value = '';
             document.getElementById('keyStatus').textContent = '';
@@ -1307,7 +1332,11 @@ Patent #65: Recursive 7⁴-Lattice Cryptographic Shell System
             const usageCountEl = document.getElementById('usageCount');
             const usageLimitEl = document.getElementById('usageLimit');
             const usageLabel = document.getElementById('usageLabel');
+            const maxFileSizeDisplay = document.getElementById('maxFileSizeDisplay');
 
+            // Update current tier
+            currentTier = tier;
+            
             tierBar.className = 'tier-bar ' + tier;
             tierName.className = 'tier-name ' + tier;
 
@@ -1317,18 +1346,21 @@ Patent #65: Recursive 7⁴-Lattice Cryptographic Shell System
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '∞';
                 usageLabel.textContent = 'unlimited';
+                maxFileSizeDisplay.textContent = '100MB';
             } else if (tier === 'starter') {
                 tierIcon.textContent = '⭐';
                 tierName.textContent = 'Starter Plan';
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '50,000';
                 usageLabel.textContent = 'encryptions this month';
+                maxFileSizeDisplay.textContent = '50MB';
             } else {
                 tierIcon.textContent = '🆓';
                 tierName.textContent = 'Free Tier';
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '100';
                 usageLabel.textContent = 'encryptions today';
+                maxFileSizeDisplay.textContent = '10MB';
             }
 
             usageCount = usage?.current || 0;
