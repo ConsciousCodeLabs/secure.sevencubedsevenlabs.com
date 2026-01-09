@@ -3,1218 +3,1455 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Encrypt | Seven Cubed Seven Labs</title>
-    <meta name="description" content="Encrypt your files with 2,401 unique pathways. Zero trust, you hold the keys.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>Secure File Encryption | Patent #65 | Seven Cubed Seven Labs</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+        
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #0ea5e9;
-            --accent: #10b981;
-            --danger: #ef4444;
+            --primary: #4F46E5;
+            --primary-dark: #3730a3;
+            --success: #10b981;
             --warning: #f59e0b;
-            --dark: #0f172a;
-            --dark-lighter: #1e293b;
-            --dark-card: #151d2e;
-            --gray: #64748b;
-            --light: #f1f5f9;
-            --white: #ffffff;
-            --gradient: linear-gradient(135deg, #6366f1 0%, #0ea5e9 50%, #10b981 100%);
+            --danger: #ef4444;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
         }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--dark);
-            color: var(--white);
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
             min-height: 100vh;
-            line-height: 1.6;
+            color: var(--gray-100);
         }
-
-        .bg-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(ellipse at 30% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(14, 165, 233, 0.12) 0%, transparent 50%),
-                var(--dark);
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
         }
-
-        header {
-            padding: 1.5rem 2rem;
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo span {
+            color: var(--primary);
+        }
+        
+        .tagline {
+            color: var(--gray-400);
+            font-size: 0.9rem;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
+        
+        .status-bar.free {
+            border-color: var(--gray-600);
         }
-
-        .header-links {
+        
+        .status-bar.starter {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+        }
+        
+        .status-bar.enterprise {
+            border-color: var(--warning);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(234, 179, 8, 0.1) 100%);
+        }
+        
+        .tier-badge {
             display: flex;
-            gap: 1.5rem;
             align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
         }
-
-        .header-links a {
-            color: var(--gray);
+        
+        .tier-badge.free {
+            color: var(--gray-400);
+        }
+        
+        .tier-badge.starter {
+            color: var(--primary);
+        }
+        
+        .tier-badge.enterprise {
+            color: var(--warning);
+        }
+        
+        .tier-icon {
+            font-size: 1.25rem;
+        }
+        
+        .usage-info {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--gray-400);
+        }
+        
+        .usage-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .upgrade-link {
+            color: var(--primary);
             text-decoration: none;
+            font-size: 0.85rem;
             font-weight: 500;
-            transition: color 0.3s;
         }
-
-        .header-links a:hover {
-            color: var(--white);
+        
+        .upgrade-link:hover {
+            text-decoration: underline;
         }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
+        
+        /* Main Card */
+        .main-card {
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            border-radius: 16px;
+            overflow: hidden;
         }
-
-        .page-title {
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0ea5e9 100%);
+            padding: 1.5rem;
             text-align: center;
-            margin-bottom: 3rem;
         }
-
-        .page-title h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
+        
+        .card-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        /* API Key Section */
+        .api-key-section {
+            background: var(--gray-900);
+            border: 1px solid var(--gray-700);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .api-key-section.has-key {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .api-key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 0.75rem;
         }
-
-        .page-title h1 span {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .page-title p {
-            color: var(--gray);
-            font-size: 1.1rem;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            background: var(--dark-lighter);
-            padding: 0.5rem;
-            border-radius: 12px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            background: transparent;
-            color: var(--gray);
-            font-size: 1rem;
+        
+        .api-key-label {
             font-weight: 600;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 0.5rem;
         }
-
-        .tab:hover {
-            color: var(--white);
+        
+        .api-key-label .icon {
+            font-size: 1.1rem;
         }
-
-        .tab.active {
+        
+        .api-key-hint {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        
+        .api-key-input-wrapper {
+            position: relative;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-right: 100px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 8px;
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .api-key-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .api-key-input::placeholder {
+            color: var(--gray-500);
+        }
+        
+        .api-key-actions {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-apply {
             background: var(--primary);
-            color: var(--white);
+            color: white;
         }
-
-        .card {
-            background: var(--dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 2.5rem;
-            margin-bottom: 2rem;
+        
+        .btn-apply:hover {
+            background: var(--primary-dark);
         }
-
+        
+        .btn-clear {
+            background: var(--gray-700);
+            color: var(--gray-300);
+        }
+        
+        .btn-clear:hover {
+            background: var(--gray-600);
+        }
+        
+        .api-key-status {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .api-key-status.valid {
+            color: var(--success);
+        }
+        
+        .api-key-status.invalid {
+            color: var(--danger);
+        }
+        
+        .api-key-footer {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+        
+        .api-key-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .api-key-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Drop Zone */
         .drop-zone {
-            border: 2px dashed rgba(99, 102, 241, 0.5);
-            border-radius: 16px;
+            border: 2px dashed var(--gray-600);
+            border-radius: 12px;
             padding: 3rem 2rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: rgba(99, 102, 241, 0.05);
+            margin-bottom: 1.5rem;
         }
-
+        
         .drop-zone:hover, .drop-zone.dragover {
             border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(79, 70, 229, 0.1);
         }
-
+        
         .drop-zone-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
         }
-
-        .drop-zone h3 {
-            font-size: 1.25rem;
+        
+        .drop-zone-text {
+            color: var(--gray-300);
             margin-bottom: 0.5rem;
         }
-
-        .drop-zone p {
-            color: var(--gray);
-            font-size: 0.95rem;
+        
+        .drop-zone-hint {
+            color: var(--gray-500);
+            font-size: 0.85rem;
         }
-
-        .drop-zone input {
+        
+        .file-input {
             display: none;
         }
-
+        
+        /* File Info */
         .file-info {
+            background: var(--gray-900);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
             display: none;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin-top: 1.5rem;
         }
-
-        .file-info.show {
+        
+        .file-info.visible {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
-
-        .file-info-icon {
+        
+        .file-icon {
             font-size: 2rem;
         }
-
-        .file-info-details {
+        
+        .file-details {
             flex: 1;
         }
-
-        .file-info-name {
+        
+        .file-name {
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            color: white;
+            word-break: break-all;
         }
-
-        .file-info-size {
-            color: var(--gray);
-            font-size: 0.875rem;
+        
+        .file-size {
+            font-size: 0.85rem;
+            color: var(--gray-400);
         }
-
-        .file-info-remove {
-            background: none;
+        
+        .file-remove {
+            background: var(--gray-700);
             border: none;
-            color: var(--danger);
+            color: var(--gray-400);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1.5rem;
-            padding: 0.5rem;
+            font-size: 1.25rem;
         }
-
+        
+        .file-remove:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Pathway Selector */
         .pathway-section {
-            margin-top: 2rem;
+            margin-bottom: 1.5rem;
         }
-
-        .pathway-section h4 {
-            font-size: 1rem;
+        
+        .pathway-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
+        }
+        
+        .pathway-label {
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-
+        
+        .pathway-presets {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .preset-btn {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--gray-600);
+            background: transparent;
+            color: var(--gray-400);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preset-btn:hover, .preset-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+        
         .pathway-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
         }
-
-        .pathway-shell {
+        
+        .shell-selector {
+            background: var(--gray-900);
+            border-radius: 10px;
+            padding: 1rem;
             text-align: center;
         }
-
-        .pathway-shell label {
-            display: block;
+        
+        .shell-label {
             font-size: 0.75rem;
-            color: var(--gray);
+            color: var(--gray-500);
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        .pathway-shell select {
+        
+        .shell-select {
             width: 100%;
-            padding: 0.875rem;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: var(--dark-lighter);
-            color: var(--white);
-            font-size: 1.25rem;
+            padding: 0.6rem;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
             font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            cursor: pointer;
             text-align: center;
+            cursor: pointer;
         }
-
-        .pathway-shell select:focus {
+        
+        .shell-select:focus {
             outline: none;
             border-color: var(--primary);
         }
-
+        
         .pathway-display {
             text-align: center;
             margin-top: 1rem;
             font-family: 'JetBrains Mono', monospace;
-            color: var(--gray);
-        }
-
-        .pathway-display span {
             color: var(--primary);
+            font-size: 1.25rem;
             font-weight: 600;
         }
-
-        .action-btn {
-            width: 100%;
-            padding: 1.25rem;
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 2rem;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
-
-        .action-btn.encrypt {
-            background: var(--gradient);
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #0ea5e9 100%);
             color: white;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
         }
-
-        .action-btn.encrypt:hover:not(:disabled) {
+        
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
         }
-
-        .action-btn.decrypt {
-            background: linear-gradient(135deg, #10b981 0%, #0ea5e9 100%);
-            color: white;
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-        }
-
-        .action-btn.decrypt:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
-        }
-
-        .action-btn:disabled {
+        
+        .btn-primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
-
-        .results {
-            display: none;
+        
+        .btn-secondary {
+            background: var(--gray-700);
+            color: var(--gray-300);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--gray-600);
+        }
+        
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Results Section */
+        .results-section {
             margin-top: 2rem;
+            display: none;
         }
-
-        .results.show {
+        
+        .results-section.visible {
             display: block;
         }
-
-        .results h3 {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .result-item {
-            background: var(--dark-lighter);
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .result-item-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .result-item-icon {
-            font-size: 1.75rem;
-        }
-
-        .result-item-name {
-            font-weight: 600;
-        }
-
-        .result-item-size {
-            color: var(--gray);
-            font-size: 0.875rem;
-        }
-
-        .download-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .download-btn:hover {
-            background: var(--primary-dark);
-        }
-
-        .encryption-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Decrypt file drop zones */
-        .decrypt-drop-zone {
-            border: 2px dashed rgba(16, 185, 129, 0.4);
+        
+        .result-card {
+            background: var(--gray-900);
             border-radius: 12px;
             padding: 1.5rem;
-            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .result-icon {
+            font-size: 1.5rem;
+        }
+        
+        .result-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-700);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            color: var(--gray-400);
+        }
+        
+        .result-value {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--success);
+        }
+        
+        .download-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-download {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(16, 185, 129, 0.05);
-            margin-bottom: 1.5rem;
-        }
-
-        .decrypt-drop-zone:hover, .decrypt-drop-zone.dragover {
-            border-color: var(--accent);
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .decrypt-drop-zone.loaded {
-            border-color: var(--accent);
-            background: rgba(16, 185, 129, 0.15);
-        }
-
-        .decrypt-drop-zone h4 {
-            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            transition: all 0.2s;
         }
-
-        .decrypt-drop-zone p {
-            color: var(--gray);
-            font-size: 0.875rem;
+        
+        .btn-download.encrypted {
+            background: var(--primary);
+            color: white;
         }
-
-        .decrypt-drop-zone .loaded-info {
-            display: none;
-            color: var(--accent);
-            font-weight: 600;
+        
+        .btn-download.key {
+            background: var(--success);
+            color: white;
         }
-
-        .decrypt-drop-zone.loaded .loaded-info {
-            display: block;
+        
+        .btn-download:hover {
+            transform: translateY(-2px);
         }
-
-        .decrypt-drop-zone.loaded .default-info {
-            display: none;
-        }
-
-        .decrypt-drop-zone input {
-            display: none;
-        }
-
-        .loading {
-            display: none;
-        }
-
-        .loading.show {
+        
+        /* Warning Banner */
+        .warning-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
             display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        
+        .warning-banner .icon {
+            font-size: 1.25rem;
+            color: var(--warning);
+        }
+        
+        .warning-banner .text {
+            font-size: 0.85rem;
+            color: var(--gray-300);
+        }
+        
+        .warning-banner strong {
+            color: var(--warning);
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.9);
+            display: none;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
-            padding: 2rem;
+            z-index: 1000;
         }
-
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(99, 102, 241, 0.3);
+        
+        .loading-overlay.visible {
+            display: flex;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-700);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
-
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
-        .error-message {
-            display: none;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--danger);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-top: 1rem;
+        
+        .loading-text {
+            color: var(--gray-300);
         }
-
-        .error-message.show {
+        
+        /* Rate Limit Warning */
+        .rate-limit-warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        
+        .rate-limit-warning.visible {
             display: block;
         }
-
-        .info-box {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin-top: 2rem;
+        
+        .rate-limit-warning h3 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
         }
-
-        .info-box h4 {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
+        
+        .rate-limit-warning p {
+            color: var(--gray-400);
+            margin-bottom: 1rem;
         }
-
-        .info-box p {
-            color: var(--gray);
-            font-size: 0.9rem;
-            line-height: 1.7;
+        
+        .rate-limit-warning .btn {
+            display: inline-flex;
         }
-
-        footer {
+        
+        /* Footer */
+        .footer {
             text-align: center;
             padding: 2rem;
-            color: var(--gray);
-            font-size: 0.875rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 3rem;
+            color: var(--gray-500);
+            font-size: 0.85rem;
         }
-
-        footer a {
+        
+        .footer a {
             color: var(--primary);
             text-decoration: none;
         }
-
-        @media (max-width: 600px) {
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer-links {
+            margin-top: 0.5rem;
+        }
+        
+        .footer-links a {
+            margin: 0 0.75rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
             .container {
-                padding: 2rem 1rem;
+                padding: 1rem;
             }
             
-            .card {
-                padding: 1.5rem;
+            .status-bar {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .usage-info {
+                text-align: center;
             }
             
             .pathway-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .encryption-stats {
+            .action-buttons, .download-buttons {
                 grid-template-columns: 1fr;
             }
             
-            .result-item {
+            .api-key-input {
+                padding-right: 1rem;
+            }
+            
+            .api-key-actions {
+                position: static;
+                transform: none;
+                margin-top: 0.75rem;
+                justify-content: flex-end;
+            }
+            
+            .api-key-input-wrapper {
+                display: flex;
                 flex-direction: column;
-                gap: 1rem;
-                text-align: center;
             }
         }
     </style>
 </head>
 <body>
-    <div class="bg-pattern"></div>
-
-    <header>
-        <a href="https://sevencubedsevenlabs.com" class="logo">7³×7 Secure</a>
-        <div class="header-links">
-            <a href="https://sevencubedsevenlabs.com">Home</a>
-            <a href="https://api.sevencubedsevenlabs.com/docs" target="_blank">API Docs</a>
-            <a href="mailto:7cubed7@proton.me">Contact</a>
-        </div>
-    </header>
-
     <div class="container">
-        <div class="page-title">
-            <h1>🔐 <span>Secure Encrypt</span></h1>
-            <p>Encrypt your files with 2,401 unique pathways. Zero trust — you hold the keys.</p>
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🔐 <span>Seven Cubed Seven</span> Labs</div>
+            <div class="tagline">Patent #65 | 2,401 Pathways of Protection</div>
         </div>
-
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('encrypt')">
-                🔒 Encrypt
-            </button>
-            <button class="tab" onclick="switchTab('decrypt')">
-                🔓 Decrypt
-            </button>
-        </div>
-
-        <!-- Encrypt Panel -->
-        <div id="encrypt-panel" class="card">
-            <div class="drop-zone" id="dropZone">
-                <div class="drop-zone-icon">📁</div>
-                <h3>Drop your file here</h3>
-                <p>or click to browse • Max 5MB for demo</p>
-                <input type="file" id="fileInput">
+        
+        <!-- Status Bar -->
+        <div class="status-bar free" id="statusBar">
+            <div class="tier-badge free" id="tierBadge">
+                <span class="tier-icon">🆓</span>
+                <span id="tierName">Free Tier</span>
             </div>
-
-            <div class="file-info" id="fileInfo">
-                <div class="file-info-icon">📄</div>
-                <div class="file-info-details">
-                    <div class="file-info-name" id="fileName">document.pdf</div>
-                    <div class="file-info-size" id="fileSize">2.4 MB</div>
-                </div>
-                <button class="file-info-remove" onclick="clearFile()">×</button>
-            </div>
-
-            <div class="pathway-section">
-                <h4>🛤️ Select Encryption Pathway</h4>
-                <div class="pathway-grid">
-                    <div class="pathway-shell">
-                        <label>Shell 1</label>
-                        <select id="shell1">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="pathway-shell">
-                        <label>Shell 2</label>
-                        <select id="shell2">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="pathway-shell">
-                        <label>Shell 3</label>
-                        <select id="shell3">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="pathway-shell">
-                        <label>Shell 4</label>
-                        <select id="shell4">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="pathway-display">
-                    Pathway: <span id="pathwayDisplay">[3, 3, 3, 3]</span> — 1 of 2,401 unique routes
-                </div>
-            </div>
-
-            <button class="action-btn encrypt" id="encryptBtn" onclick="encryptFile()" disabled>
-                🔒 Encrypt File
-            </button>
-
-            <div class="loading" id="encryptLoading">
-                <div class="spinner"></div>
-                <span>Encrypting through 4 shells...</span>
-            </div>
-
-            <div class="error-message" id="encryptError"></div>
-
-            <div class="results" id="encryptResults">
-                <h3>✅ Encryption Complete!</h3>
-                
-                <div class="result-item">
-                    <div class="result-item-info">
-                        <div class="result-item-icon">🔐</div>
-                        <div>
-                            <div class="result-item-name" id="encryptedFileName">file.encrypted</div>
-                            <div class="result-item-size" id="encryptedFileSize">3.2 MB</div>
-                        </div>
-                    </div>
-                    <button class="download-btn" onclick="downloadEncrypted()">
-                        ⬇️ Download
-                    </button>
-                </div>
-
-                <div class="result-item">
-                    <div class="result-item-info">
-                        <div class="result-item-icon">🔑</div>
-                        <div>
-                            <div class="result-item-name" id="keyFileName">file.key</div>
-                            <div class="result-item-size">Contains key + pathway</div>
-                        </div>
-                    </div>
-                    <button class="download-btn" onclick="downloadKey()">
-                        ⬇️ Download
-                    </button>
-                </div>
-
-                <div class="encryption-stats">
-                    <div class="stat-item">
-                        <div class="stat-value" id="statTime">0.23ms</div>
-                        <div class="stat-label">Encryption Time</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="statPathway">[3,3,3,3]</div>
-                        <div class="stat-label">Pathway Used</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="statExpansion">1.4x</div>
-                        <div class="stat-label">Size Expansion</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-box">
-                <h4>🔐 Zero Trust Encryption</h4>
-                <p>
-                    Your file is encrypted in your browser, sent through our API, and returned to you. 
-                    <strong>We never store your data or keys.</strong> Download both files and store them securely — 
-                    you'll need the .encrypted file AND the .key file to decrypt later.
-                </p>
+            <div class="usage-info">
+                <div class="usage-count" id="usageCount">0 / 100</div>
+                <div id="usagePeriod">encryptions today</div>
+                <a href="pricing.html" class="upgrade-link" id="upgradeLink">Upgrade to Starter →</a>
             </div>
         </div>
-
-        <!-- Decrypt Panel -->
-        <div id="decrypt-panel" class="card" style="display: none;">
+        
+        <!-- Rate Limit Warning -->
+        <div class="rate-limit-warning" id="rateLimitWarning">
+            <h3>⚠️ Daily Limit Reached</h3>
+            <p>You've used all 100 free encryptions for today. Upgrade to Starter for 50,000 encryptions per month!</p>
+            <a href="pricing.html" class="btn btn-primary">Upgrade Now - $29.99/mo</a>
+        </div>
+        
+        <!-- Main Card -->
+        <div class="main-card">
+            <div class="card-header">
+                <h1>🔐 Secure File Encryption</h1>
+                <p>4-Shell Recursive Encryption • 2,401 Unique Pathways</p>
+            </div>
             
-            <!-- Encrypted File Drop -->
-            <div class="decrypt-drop-zone" id="encryptedDropZone">
-                <h4>📄 Drop .encrypted file here</h4>
-                <p class="default-info">or click to browse</p>
-                <p class="loaded-info">✅ Encrypted file loaded!</p>
-                <input type="file" id="encryptedFileInput" accept=".encrypted">
-            </div>
-
-            <!-- Key File Drop -->
-            <div class="decrypt-drop-zone" id="keyDropZone">
-                <h4>🔑 Drop .key file here</h4>
-                <p class="default-info">or click to browse</p>
-                <p class="loaded-info">✅ Key file loaded!</p>
-                <input type="file" id="keyFileInput" accept=".key">
-            </div>
-
-            <!-- Pathway Display (auto-filled from key file) -->
-            <div class="pathway-section">
-                <h4>🛤️ Pathway (auto-detected from key file)</h4>
-                <div class="pathway-grid">
-                    <div class="pathway-shell">
-                        <label>Shell 1</label>
-                        <select id="decryptShell1">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
+            <div class="card-body">
+                <!-- API Key Section -->
+                <div class="api-key-section" id="apiKeySection">
+                    <div class="api-key-header">
+                        <div class="api-key-label">
+                            <span class="icon">🔑</span>
+                            API Key (optional)
+                        </div>
+                        <div class="api-key-hint">Leave blank for free tier</div>
                     </div>
-                    <div class="pathway-shell">
-                        <label>Shell 2</label>
-                        <select id="decryptShell2">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="pathway-shell">
-                        <label>Shell 3</label>
-                        <select id="decryptShell3">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="pathway-shell">
-                        <label>Shell 4</label>
-                        <select id="decryptShell4">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <button class="action-btn decrypt" id="decryptBtn" onclick="decryptFile()" disabled>
-                🔓 Decrypt File
-            </button>
-
-            <div class="loading" id="decryptLoading">
-                <div class="spinner"></div>
-                <span>Decrypting through 4 shells...</span>
-            </div>
-
-            <div class="error-message" id="decryptError"></div>
-
-            <div class="results" id="decryptResults">
-                <h3>✅ Decryption Complete!</h3>
-                
-                <div class="result-item">
-                    <div class="result-item-info">
-                        <div class="result-item-icon">📄</div>
-                        <div>
-                            <div class="result-item-name" id="decryptedFileName">Decrypted File</div>
-                            <div class="result-item-size" id="decryptedFileSize">Original restored</div>
+                    <div class="api-key-input-wrapper">
+                        <input 
+                            type="password" 
+                            class="api-key-input" 
+                            id="apiKeyInput" 
+                            placeholder="Paste your API key here..."
+                        >
+                        <div class="api-key-actions">
+                            <button class="btn-small btn-apply" id="applyKeyBtn">Apply</button>
+                            <button class="btn-small btn-clear" id="clearKeyBtn">Clear</button>
                         </div>
                     </div>
-                    <button class="download-btn" onclick="downloadDecrypted()">
-                        ⬇️ Download
+                    <div class="api-key-status" id="apiKeyStatus"></div>
+                    <div class="api-key-footer">
+                        Don't have an API key? <a href="pricing.html">Get Starter Plan</a> for 50,000 encryptions/month
+                    </div>
+                </div>
+                
+                <!-- Drop Zone -->
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-icon">📁</div>
+                    <div class="drop-zone-text">Drag & drop a file here</div>
+                    <div class="drop-zone-hint">or click to browse • Max 10MB</div>
+                    <input type="file" class="file-input" id="fileInput">
+                </div>
+                
+                <!-- File Info -->
+                <div class="file-info" id="fileInfo">
+                    <div class="file-icon">📄</div>
+                    <div class="file-details">
+                        <div class="file-name" id="fileName">document.pdf</div>
+                        <div class="file-size" id="fileSize">1.2 MB</div>
+                    </div>
+                    <button class="file-remove" id="removeFile">×</button>
+                </div>
+                
+                <!-- Pathway Selector -->
+                <div class="pathway-section">
+                    <div class="pathway-header">
+                        <div class="pathway-label">
+                            <span>🛤️</span>
+                            Select Pathway
+                        </div>
+                        <div class="pathway-presets">
+                            <button class="preset-btn" data-pathway="3,3,3,3">Standard</button>
+                            <button class="preset-btn" data-pathway="5,2,1,4">Financial</button>
+                            <button class="preset-btn" data-pathway="7,7,7,7">Maximum</button>
+                        </div>
+                    </div>
+                    <div class="pathway-grid">
+                        <div class="shell-selector">
+                            <div class="shell-label">Shell 1</div>
+                            <select class="shell-select" id="shell1">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                        <div class="shell-selector">
+                            <div class="shell-label">Shell 2</div>
+                            <select class="shell-select" id="shell2">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                        <div class="shell-selector">
+                            <div class="shell-label">Shell 3</div>
+                            <select class="shell-select" id="shell3">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                        <div class="shell-selector">
+                            <div class="shell-label">Shell 4</div>
+                            <select class="shell-select" id="shell4">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pathway-display">
+                        Pathway: [<span id="pathwayDisplay">3, 3, 3, 3</span>]
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="encryptBtn" disabled>
+                        <span>🔒</span> Encrypt File
+                    </button>
+                    <button class="btn btn-secondary" id="decryptBtn" disabled>
+                        <span>🔓</span> Decrypt File
                     </button>
                 </div>
+                
+                <!-- Results Section -->
+                <div class="results-section" id="resultsSection">
+                    <div class="result-card">
+                        <div class="result-header">
+                            <span class="result-icon">✅</span>
+                            <span class="result-title">Encryption Successful</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Original Size</span>
+                            <span class="result-value" id="resultOriginalSize">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Encrypted Size</span>
+                            <span class="result-value" id="resultEncryptedSize">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Pathway Used</span>
+                            <span class="result-value" id="resultPathway">-</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Encryption Time</span>
+                            <span class="result-value" id="resultTime">-</span>
+                        </div>
+                        
+                        <div class="download-buttons">
+                            <button class="btn-download encrypted" id="downloadEncrypted">
+                                📄 Download .encrypted
+                            </button>
+                            <button class="btn-download key" id="downloadKey">
+                                🔑 Download .key
+                            </button>
+                        </div>
+                        
+                        <div class="warning-banner">
+                            <span class="icon">⚠️</span>
+                            <div class="text">
+                                <strong>IMPORTANT:</strong> Download BOTH files! You need the .encrypted file AND the .key file to decrypt your data. Store them in different locations for maximum security.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="info-box">
-                <h4>🔓 Decryption Requirements</h4>
-                <p>
-                    Drop your <strong>.encrypted</strong> file and <strong>.key</strong> file above.
-                    The pathway will be auto-detected from your key file.
-                    All three pieces (ciphertext, key, pathway) must match for successful decryption.
-                </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>🔐 Patent #65 | Seven Cubed Seven Labs LLC | 7³ × 7 = 2,401</p>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="guide.html">Best Practices</a>
+                <a href="https://api.sevencubedsevenlabs.com/docs" target="_blank">API Docs</a>
+                <a href="terms.html">Terms</a>
+                <a href="privacy.html">Privacy</a>
             </div>
         </div>
     </div>
-
-    <footer>
-        <p>
-            © 2026 <a href="https://sevencubedsevenlabs.com">Seven Cubed Seven Labs LLC</a>. Patent Pending.<br>
-            7³ × 7 = 2,401 pathways of protection
-        </p>
-    </footer>
-
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Encrypting through 4 shells...</div>
+        </div>
+    </div>
+    
     <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
         const API_BASE = 'https://api.sevencubedsevenlabs.com';
+        const STORAGE_KEY_API = 'patent65_api_key';
+        const STORAGE_KEY_USAGE = 'patent65_usage';
         
-        // State
-        let selectedFile = null;
-        let encryptionResult = null;
-        let decryptionResult = null;
-        let originalFileName = '';
+        // ============================================
+        // STATE
+        // ============================================
+        let currentFile = null;
+        let currentApiKey = null;
+        let encryptedData = null;
+        let keyData = null;
+        let userTier = 'free';
+        let usageCount = 0;
+        let usageLimit = 100;
         
-        // Decrypt state
-        let loadedCiphertext = null;
-        let loadedKey = null;
-        let loadedKeyData = null;
-
-        // Tab Switching
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`.tab:nth-child(${tab === 'encrypt' ? 1 : 2})`).classList.add('active');
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const elements = {
+            statusBar: document.getElementById('statusBar'),
+            tierBadge: document.getElementById('tierBadge'),
+            tierName: document.getElementById('tierName'),
+            usageCount: document.getElementById('usageCount'),
+            usagePeriod: document.getElementById('usagePeriod'),
+            upgradeLink: document.getElementById('upgradeLink'),
+            rateLimitWarning: document.getElementById('rateLimitWarning'),
+            apiKeySection: document.getElementById('apiKeySection'),
+            apiKeyInput: document.getElementById('apiKeyInput'),
+            apiKeyStatus: document.getElementById('apiKeyStatus'),
+            applyKeyBtn: document.getElementById('applyKeyBtn'),
+            clearKeyBtn: document.getElementById('clearKeyBtn'),
+            dropZone: document.getElementById('dropZone'),
+            fileInput: document.getElementById('fileInput'),
+            fileInfo: document.getElementById('fileInfo'),
+            fileName: document.getElementById('fileName'),
+            fileSize: document.getElementById('fileSize'),
+            removeFile: document.getElementById('removeFile'),
+            shell1: document.getElementById('shell1'),
+            shell2: document.getElementById('shell2'),
+            shell3: document.getElementById('shell3'),
+            shell4: document.getElementById('shell4'),
+            pathwayDisplay: document.getElementById('pathwayDisplay'),
+            encryptBtn: document.getElementById('encryptBtn'),
+            decryptBtn: document.getElementById('decryptBtn'),
+            resultsSection: document.getElementById('resultsSection'),
+            resultOriginalSize: document.getElementById('resultOriginalSize'),
+            resultEncryptedSize: document.getElementById('resultEncryptedSize'),
+            resultPathway: document.getElementById('resultPathway'),
+            resultTime: document.getElementById('resultTime'),
+            downloadEncrypted: document.getElementById('downloadEncrypted'),
+            downloadKey: document.getElementById('downloadKey'),
+            loadingOverlay: document.getElementById('loadingOverlay')
+        };
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function init() {
+            // Load saved API key
+            const savedKey = localStorage.getItem(STORAGE_KEY_API);
+            if (savedKey) {
+                elements.apiKeyInput.value = savedKey;
+                validateAndApplyKey(savedKey);
+            } else {
+                loadFreeUsage();
+            }
             
-            document.getElementById('encrypt-panel').style.display = tab === 'encrypt' ? 'block' : 'none';
-            document.getElementById('decrypt-panel').style.display = tab === 'decrypt' ? 'block' : 'none';
+            // Event Listeners
+            setupEventListeners();
+            updatePathwayDisplay();
         }
-
-        // ========== ENCRYPT SECTION ==========
         
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-
-        dropZone.addEventListener('click', () => fileInput.click());
+        function setupEventListeners() {
+            // API Key
+            elements.applyKeyBtn.addEventListener('click', () => {
+                const key = elements.apiKeyInput.value.trim();
+                validateAndApplyKey(key);
+            });
+            
+            elements.clearKeyBtn.addEventListener('click', clearApiKey);
+            
+            elements.apiKeyInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const key = elements.apiKeyInput.value.trim();
+                    validateAndApplyKey(key);
+                }
+            });
+            
+            // Drop Zone
+            elements.dropZone.addEventListener('click', () => elements.fileInput.click());
+            elements.dropZone.addEventListener('dragover', handleDragOver);
+            elements.dropZone.addEventListener('dragleave', handleDragLeave);
+            elements.dropZone.addEventListener('drop', handleDrop);
+            elements.fileInput.addEventListener('change', handleFileSelect);
+            elements.removeFile.addEventListener('click', removeFile);
+            
+            // Pathway
+            document.querySelectorAll('.shell-select').forEach(select => {
+                select.addEventListener('change', updatePathwayDisplay);
+            });
+            
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => applyPreset(btn.dataset.pathway));
+            });
+            
+            // Actions
+            elements.encryptBtn.addEventListener('click', encryptFile);
+            elements.decryptBtn.addEventListener('click', decryptFile);
+            elements.downloadEncrypted.addEventListener('click', downloadEncryptedFile);
+            elements.downloadKey.addEventListener('click', downloadKeyFile);
+        }
         
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) {
-                handleFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                handleFile(e.target.files[0]);
-            }
-        });
-
-        function handleFile(file) {
-            if (file.size > 5 * 1024 * 1024) {
-                showError('encryptError', 'File too large. Maximum 5MB for demo.');
+        // ============================================
+        // API KEY MANAGEMENT
+        // ============================================
+        async function validateAndApplyKey(key) {
+            if (!key) {
+                clearApiKey();
                 return;
             }
-
-            selectedFile = file;
-            originalFileName = file.name;
             
-            document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileSize').textContent = formatSize(file.size);
-            document.getElementById('fileInfo').classList.add('show');
-            document.getElementById('encryptBtn').disabled = false;
+            // Basic format validation (64 hex chars)
+            if (!/^[a-f0-9]{64}$/i.test(key)) {
+                showKeyStatus('invalid', '❌ Invalid key format (expected 64 hex characters)');
+                return;
+            }
             
-            hideError('encryptError');
-            document.getElementById('encryptResults').classList.remove('show');
+            // For now, accept valid format keys
+            // In production, you'd validate against the server
+            currentApiKey = key;
+            localStorage.setItem(STORAGE_KEY_API, key);
+            
+            // Update UI for Starter tier
+            setTier('starter');
+            showKeyStatus('valid', '✅ API key applied - Starter Plan active');
+            elements.apiKeySection.classList.add('has-key');
         }
-
-        function clearFile() {
-            selectedFile = null;
-            originalFileName = '';
-            document.getElementById('fileInfo').classList.remove('show');
-            document.getElementById('encryptBtn').disabled = true;
-            document.getElementById('encryptResults').classList.remove('show');
-            fileInput.value = '';
+        
+        function clearApiKey() {
+            currentApiKey = null;
+            localStorage.removeItem(STORAGE_KEY_API);
+            elements.apiKeyInput.value = '';
+            elements.apiKeySection.classList.remove('has-key');
+            elements.apiKeyStatus.innerHTML = '';
+            setTier('free');
+            loadFreeUsage();
         }
-
-        function formatSize(bytes) {
-            if (bytes < 1024) return bytes + ' bytes';
+        
+        function showKeyStatus(type, message) {
+            elements.apiKeyStatus.className = 'api-key-status ' + type;
+            elements.apiKeyStatus.innerHTML = message;
+        }
+        
+        // ============================================
+        // TIER & USAGE MANAGEMENT
+        // ============================================
+        function setTier(tier) {
+            userTier = tier;
+            
+            // Update status bar
+            elements.statusBar.className = 'status-bar ' + tier;
+            elements.tierBadge.className = 'tier-badge ' + tier;
+            
+            if (tier === 'free') {
+                elements.tierBadge.querySelector('.tier-icon').textContent = '🆓';
+                elements.tierName.textContent = 'Free Tier';
+                elements.usagePeriod.textContent = 'encryptions today';
+                elements.upgradeLink.style.display = 'inline';
+                usageLimit = 100;
+            } else if (tier === 'starter') {
+                elements.tierBadge.querySelector('.tier-icon').textContent = '⭐';
+                elements.tierName.textContent = 'Starter Plan';
+                elements.usagePeriod.textContent = 'encryptions this month';
+                elements.upgradeLink.style.display = 'none';
+                usageLimit = 50000;
+                usageCount = 0; // Reset for demo, in production fetch from server
+            } else if (tier === 'enterprise') {
+                elements.tierBadge.querySelector('.tier-icon').textContent = '🏢';
+                elements.tierName.textContent = 'Enterprise';
+                elements.usagePeriod.textContent = 'unlimited';
+                elements.upgradeLink.style.display = 'none';
+                usageLimit = Infinity;
+            }
+            
+            updateUsageDisplay();
+        }
+        
+        function loadFreeUsage() {
+            // Load today's usage from localStorage
+            const today = new Date().toDateString();
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_USAGE) || '{}');
+            
+            if (saved.date === today) {
+                usageCount = saved.count || 0;
+            } else {
+                // New day, reset count
+                usageCount = 0;
+                saveFreeUsage();
+            }
+            
+            updateUsageDisplay();
+            checkRateLimit();
+        }
+        
+        function saveFreeUsage() {
+            const today = new Date().toDateString();
+            localStorage.setItem(STORAGE_KEY_USAGE, JSON.stringify({
+                date: today,
+                count: usageCount
+            }));
+        }
+        
+        function incrementUsage() {
+            usageCount++;
+            if (userTier === 'free') {
+                saveFreeUsage();
+            }
+            updateUsageDisplay();
+            checkRateLimit();
+        }
+        
+        function updateUsageDisplay() {
+            if (userTier === 'enterprise') {
+                elements.usageCount.textContent = usageCount + ' / ∞';
+            } else {
+                elements.usageCount.textContent = usageCount + ' / ' + usageLimit.toLocaleString();
+            }
+        }
+        
+        function checkRateLimit() {
+            if (userTier === 'free' && usageCount >= usageLimit) {
+                elements.rateLimitWarning.classList.add('visible');
+                elements.encryptBtn.disabled = true;
+            } else {
+                elements.rateLimitWarning.classList.remove('visible');
+                updateButtonState();
+            }
+        }
+        
+        // ============================================
+        // FILE HANDLING
+        // ============================================
+        function handleDragOver(e) {
+            e.preventDefault();
+            elements.dropZone.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            elements.dropZone.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            elements.dropZone.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+        
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+        
+        function processFile(file) {
+            // Check file size (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File too large. Maximum size is 10MB.');
+                return;
+            }
+            
+            currentFile = file;
+            elements.fileName.textContent = file.name;
+            elements.fileSize.textContent = formatFileSize(file.size);
+            elements.fileInfo.classList.add('visible');
+            elements.dropZone.style.display = 'none';
+            
+            // Check if it's an encrypted file (for decryption)
+            if (file.name.endsWith('.encrypted')) {
+                elements.decryptBtn.disabled = false;
+                elements.encryptBtn.disabled = true;
+            } else {
+                elements.encryptBtn.disabled = false;
+                elements.decryptBtn.disabled = true;
+            }
+            
+            // Hide previous results
+            elements.resultsSection.classList.remove('visible');
+        }
+        
+        function removeFile() {
+            currentFile = null;
+            elements.fileInfo.classList.remove('visible');
+            elements.dropZone.style.display = 'block';
+            elements.fileInput.value = '';
+            elements.encryptBtn.disabled = true;
+            elements.decryptBtn.disabled = true;
+            elements.resultsSection.classList.remove('visible');
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
             if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
             return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
         }
-
-        document.querySelectorAll('#encrypt-panel select').forEach(select => {
-            select.addEventListener('change', updatePathwayDisplay);
-        });
-
-        function updatePathwayDisplay() {
-            const pathway = getEncryptPathway();
-            document.getElementById('pathwayDisplay').textContent = `[${pathway.join(', ')}]`;
-        }
-
-        function getEncryptPathway() {
-            return [
-                parseInt(document.getElementById('shell1').value),
-                parseInt(document.getElementById('shell2').value),
-                parseInt(document.getElementById('shell3').value),
-                parseInt(document.getElementById('shell4').value)
-            ];
-        }
-
-        function getDecryptPathway() {
-            return [
-                parseInt(document.getElementById('decryptShell1').value),
-                parseInt(document.getElementById('decryptShell2').value),
-                parseInt(document.getElementById('decryptShell3').value),
-                parseInt(document.getElementById('decryptShell4').value)
-            ];
-        }
-
-        async function encryptFile() {
-            if (!selectedFile) return;
-
-            const encryptBtn = document.getElementById('encryptBtn');
-            const loading = document.getElementById('encryptLoading');
-            const results = document.getElementById('encryptResults');
-
-            encryptBtn.disabled = true;
-            loading.classList.add('show');
-            results.classList.remove('show');
-            hideError('encryptError');
-
-            try {
-                const base64Data = await fileToBase64(selectedFile);
-                const pathway = getEncryptPathway();
-
-                const response = await fetch(`${API_BASE}/encrypt`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        plaintext: base64Data,
-                        pathway: pathway
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                encryptionResult = data;
-
-                const baseName = originalFileName.replace(/\.[^/.]+$/, '');
-                document.getElementById('encryptedFileName').textContent = `${baseName}.encrypted`;
-                document.getElementById('encryptedFileSize').textContent = formatSize(data.ciphertext.length);
-                document.getElementById('keyFileName').textContent = `${baseName}.key`;
-                
-                document.getElementById('statTime').textContent = data.encryption_time_ms.toFixed(2) + 'ms';
-                document.getElementById('statPathway').textContent = `[${data.pathway_used.join(',')}]`;
-                
-                const expansion = (data.ciphertext_size / data.plaintext_size).toFixed(1);
-                document.getElementById('statExpansion').textContent = expansion + 'x';
-
-                results.classList.add('show');
-
-            } catch (error) {
-                showError('encryptError', 'Encryption failed: ' + error.message);
-            } finally {
-                encryptBtn.disabled = false;
-                loading.classList.remove('show');
-            }
-        }
-
-        // ========== DECRYPT SECTION ==========
         
-        const encryptedDropZone = document.getElementById('encryptedDropZone');
-        const encryptedFileInput = document.getElementById('encryptedFileInput');
-        const keyDropZone = document.getElementById('keyDropZone');
-        const keyFileInput = document.getElementById('keyFileInput');
-
-        // Encrypted file drop zone
-        encryptedDropZone.addEventListener('click', () => encryptedFileInput.click());
-        
-        encryptedDropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            encryptedDropZone.classList.add('dragover');
-        });
-
-        encryptedDropZone.addEventListener('dragleave', () => {
-            encryptedDropZone.classList.remove('dragover');
-        });
-
-        encryptedDropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            encryptedDropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) {
-                handleEncryptedFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        encryptedFileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                handleEncryptedFile(e.target.files[0]);
-            }
-        });
-
-        // Key file drop zone
-        keyDropZone.addEventListener('click', () => keyFileInput.click());
-        
-        keyDropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            keyDropZone.classList.add('dragover');
-        });
-
-        keyDropZone.addEventListener('dragleave', () => {
-            keyDropZone.classList.remove('dragover');
-        });
-
-        keyDropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            keyDropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) {
-                handleKeyFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        keyFileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                handleKeyFile(e.target.files[0]);
-            }
-        });
-
-        async function handleEncryptedFile(file) {
-            try {
-                const text = await file.text();
-                loadedCiphertext = text.trim();
-                encryptedDropZone.classList.add('loaded');
-                checkDecryptReady();
-                hideError('decryptError');
-            } catch (error) {
-                showError('decryptError', 'Failed to read encrypted file');
-            }
-        }
-
-        async function handleKeyFile(file) {
-            try {
-                const text = await file.text();
-                
-                // Try to parse as JSON (our key format)
-                try {
-                    loadedKeyData = JSON.parse(text);
-                    loadedKey = loadedKeyData.key;
-                    
-                    // Auto-fill pathway from key file
-                    if (loadedKeyData.pathway && loadedKeyData.pathway.length === 4) {
-                        document.getElementById('decryptShell1').value = loadedKeyData.pathway[0];
-                        document.getElementById('decryptShell2').value = loadedKeyData.pathway[1];
-                        document.getElementById('decryptShell3').value = loadedKeyData.pathway[2];
-                        document.getElementById('decryptShell4').value = loadedKeyData.pathway[3];
-                    }
-                } catch {
-                    // If not JSON, assume it's just the raw key
-                    loadedKey = text.trim();
-                }
-                
-                keyDropZone.classList.add('loaded');
-                checkDecryptReady();
-                hideError('decryptError');
-            } catch (error) {
-                showError('decryptError', 'Failed to read key file');
-            }
-        }
-
-        function checkDecryptReady() {
-            const decryptBtn = document.getElementById('decryptBtn');
-            decryptBtn.disabled = !(loadedCiphertext && loadedKey);
-        }
-
-        async function decryptFile() {
-            if (!loadedCiphertext || !loadedKey) {
-                showError('decryptError', 'Please load both the encrypted file and key file.');
+        function updateButtonState() {
+            if (!currentFile) {
+                elements.encryptBtn.disabled = true;
+                elements.decryptBtn.disabled = true;
                 return;
             }
-
-            const decryptBtn = document.getElementById('decryptBtn');
-            const loading = document.getElementById('decryptLoading');
-            const results = document.getElementById('decryptResults');
-
-            decryptBtn.disabled = true;
-            loading.classList.add('show');
-            results.classList.remove('show');
-            hideError('decryptError');
-
+            
+            if (currentFile.name.endsWith('.encrypted')) {
+                elements.decryptBtn.disabled = false;
+                elements.encryptBtn.disabled = true;
+            } else {
+                elements.encryptBtn.disabled = userTier === 'free' && usageCount >= usageLimit;
+                elements.decryptBtn.disabled = true;
+            }
+        }
+        
+        // ============================================
+        // PATHWAY MANAGEMENT
+        // ============================================
+        function updatePathwayDisplay() {
+            const pathway = getPathway();
+            elements.pathwayDisplay.textContent = pathway.join(', ');
+            
+            // Update preset buttons
+            const pathwayStr = pathway.join(',');
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.pathway === pathwayStr);
+            });
+        }
+        
+        function getPathway() {
+            return [
+                parseInt(elements.shell1.value),
+                parseInt(elements.shell2.value),
+                parseInt(elements.shell3.value),
+                parseInt(elements.shell4.value)
+            ];
+        }
+        
+        function applyPreset(pathwayStr) {
+            const [s1, s2, s3, s4] = pathwayStr.split(',');
+            elements.shell1.value = s1;
+            elements.shell2.value = s2;
+            elements.shell3.value = s3;
+            elements.shell4.value = s4;
+            updatePathwayDisplay();
+        }
+        
+        // ============================================
+        // ENCRYPTION
+        // ============================================
+        async function encryptFile() {
+            if (!currentFile) return;
+            
+            // Check rate limit
+            if (userTier === 'free' && usageCount >= usageLimit) {
+                checkRateLimit();
+                return;
+            }
+            
+            showLoading(true);
+            
             try {
-                const pathway = getDecryptPathway();
-
-                const response = await fetch(`${API_BASE}/decrypt`, {
+                // Read file as base64
+                const fileData = await readFileAsBase64(currentFile);
+                const pathway = getPathway();
+                
+                // Prepare headers
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                if (currentApiKey) {
+                    headers['X-API-Key'] = currentApiKey;
+                }
+                
+                // Call API
+                const response = await fetch(`${API_BASE}/encrypt`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: headers,
                     body: JSON.stringify({
-                        ciphertext: loadedCiphertext,
-                        key: loadedKey,
+                        plaintext: fileData,
                         pathway: pathway
                     })
                 });
-
+                
+                if (response.status === 429) {
+                    throw new Error('Rate limit exceeded. Please upgrade to Starter for more encryptions.');
+                }
+                
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    let errorMsg = 'Decryption failed';
-                    if (errorData.detail) {
-                        if (Array.isArray(errorData.detail)) {
-                            errorMsg = errorData.detail.map(d => d.msg || d).join(', ');
-                        } else {
-                            errorMsg = errorData.detail;
-                        }
-                    }
-                    throw new Error(errorMsg);
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Encryption failed');
                 }
-
-                const data = await response.json();
-                decryptionResult = data;
-
-                // Set filename from key data if available
-                if (loadedKeyData && loadedKeyData.originalFile) {
-                    document.getElementById('decryptedFileName').textContent = loadedKeyData.originalFile;
-                }
-                document.getElementById('decryptedFileSize').textContent = formatSize(data.plaintext.length);
-                results.classList.add('show');
-
+                
+                const result = await response.json();
+                
+                // Store results
+                encryptedData = {
+                    ciphertext: result.ciphertext,
+                    filename: currentFile.name
+                };
+                
+                keyData = {
+                    key: result.key,
+                    pathway: result.pathway_used,
+                    filename: currentFile.name,
+                    encrypted_at: new Date().toISOString()
+                };
+                
+                // Update usage
+                incrementUsage();
+                
+                // Show results
+                elements.resultOriginalSize.textContent = formatFileSize(currentFile.size);
+                elements.resultEncryptedSize.textContent = formatFileSize(result.ciphertext.length);
+                elements.resultPathway.textContent = '[' + result.pathway_used.join(', ') + ']';
+                elements.resultTime.textContent = result.encryption_time_ms.toFixed(2) + ' ms';
+                elements.resultsSection.classList.add('visible');
+                
             } catch (error) {
-                showError('decryptError', error.message);
+                alert('Error: ' + error.message);
             } finally {
-                decryptBtn.disabled = false;
-                loading.classList.remove('show');
+                showLoading(false);
             }
         }
-
-        // ========== UTILITIES ==========
-
-        function fileToBase64(file) {
+        
+        async function decryptFile() {
+            // For decryption, user needs to also provide the .key file
+            // This is a simplified demo - in production you'd have file pairing
+            alert('To decrypt, you need both the .encrypted file and the .key file.\n\nPlease use the API directly or contact support for assistance.');
+        }
+        
+        function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => {
+                    // Get base64 part after data URL prefix
                     const base64 = reader.result.split(',')[1];
                     resolve(base64);
                 };
@@ -1222,70 +1459,49 @@
                 reader.readAsDataURL(file);
             });
         }
-
-        function downloadEncrypted() {
-            if (!encryptionResult) return;
-            const baseName = originalFileName.replace(/\.[^/.]+$/, '');
-            downloadText(encryptionResult.ciphertext, `${baseName}.encrypted`);
-        }
-
-        function downloadKey() {
-            if (!encryptionResult) return;
-            const baseName = originalFileName.replace(/\.[^/.]+$/, '');
-            const keyData = JSON.stringify({
-                key: encryptionResult.key,
-                pathway: encryptionResult.pathway_used,
-                originalFile: originalFileName,
-                timestamp: new Date().toISOString()
-            }, null, 2);
-            downloadText(keyData, `${baseName}.key`);
-        }
-
-        function downloadDecrypted() {
-            if (!decryptionResult) return;
-            try {
-                const binary = atob(decryptionResult.plaintext);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    bytes[i] = binary.charCodeAt(i);
-                }
-                const blob = new Blob([bytes]);
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                
-                // Use original filename if available
-                let filename = 'decrypted_file';
-                if (loadedKeyData && loadedKeyData.originalFile) {
-                    filename = loadedKeyData.originalFile;
-                }
-                a.download = filename;
-                a.click();
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                showError('decryptError', 'Failed to download: ' + error.message);
-            }
-        }
-
-        function downloadText(content, filename) {
-            const blob = new Blob([content], { type: 'text/plain' });
+        
+        // ============================================
+        // DOWNLOADS
+        // ============================================
+        function downloadEncryptedFile() {
+            if (!encryptedData) return;
+            
+            const blob = new Blob([encryptedData.ciphertext], { type: 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = encryptedData.filename + '.encrypted';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
-
-        function showError(elementId, message) {
-            const el = document.getElementById(elementId);
-            el.textContent = '❌ ' + message;
-            el.classList.add('show');
+        
+        function downloadKeyFile() {
+            if (!keyData) return;
+            
+            const blob = new Blob([JSON.stringify(keyData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = keyData.filename + '.key';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
-
-        function hideError(elementId) {
-            document.getElementById(elementId).classList.remove('show');
+        
+        // ============================================
+        // UI HELPERS
+        // ============================================
+        function showLoading(show) {
+            elements.loadingOverlay.classList.toggle('visible', show);
         }
+        
+        // ============================================
+        // START
+        // ============================================
+        init();
     </script>
 </body>
 </html>
