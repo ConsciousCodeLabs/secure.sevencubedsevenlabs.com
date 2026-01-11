@@ -2279,8 +2279,22 @@
                     try {
                         const error = await response.json();
                         errorMessage = error.detail || error.message || errorMessage;
+                        
+                        // Improve error messages for common issues
+                        if (errorMessage.includes('verification failed') || errorMessage.includes('Decryption failed')) {
+                            errorMessage = `Decryption failed: ${errorMessage}. Verify ciphertext, key, and pathway ALL match the original encryption.`;
+                        }
                     } catch (e) {
-                        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        // If we can't parse JSON, create a helpful error based on status
+                        if (response.status === 400) {
+                            errorMessage = 'Bad request - check your file format and key';
+                        } else if (response.status === 422) {
+                            errorMessage = 'Invalid data - the file may be corrupted or the key is wrong';
+                        } else if (response.status === 500) {
+                            errorMessage = 'Server error - the pathway/key combination may be incorrect';
+                        } else {
+                            errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        }
                     }
                     throw new Error(errorMessage);
                 }
@@ -2293,11 +2307,23 @@
                 return result;
             } catch (error) {
                 console.error(`[Decrypt] Error:`, error);
-                // Re-throw with more context
-                if (error.message === 'Load failed' || error.message === 'Failed to fetch') {
+                
+                // Categorize and improve error messages
+                const errorMsg = error.message || '';
+                
+                if (errorMsg === 'Load failed' || errorMsg === 'Failed to fetch') {
+                    // True network error - but could also be CORS or timeout
                     throw new Error('Network error - please check your connection and try again');
+                } else if (errorMsg.includes('verification failed') || errorMsg.includes('Decryption failed')) {
+                    // API returned decryption error - this is the KEY insight!
+                    throw new Error(errorMsg);
+                } else if (errorMsg.includes('Invalid')) {
+                    // Validation error
+                    throw new Error(errorMsg);
+                } else {
+                    // Unknown error - pass through
+                    throw error;
                 }
-                throw error;
             }
         }
 
@@ -2348,6 +2374,126 @@
             });
         }
 
+        // Generate README for decrypted files
+        function generateDecryptReadme(pathway, results, timestamp) {
+            const pathwayId = ((pathway[0]-1) * 343) + ((pathway[1]-1) * 49) + ((pathway[2]-1) * 7) + pathway[3];
+            const fileList = results.map(r => `  • ${r.name}`).join('\n');
+            const totalTime = results.reduce((sum, r) => sum + (r.decryptionTime || 0), 0).toFixed(2);
+            
+            return `╔═══════════════════════════════════════════════════════════════════╗
+║         PATENT #65 DECRYPTED FILES - FREEDOM! 🦋                  ║
+║                Seven Cubed Seven Labs LLC                         ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+Decrypted: ${new Date().toISOString()}
+Pathway Used: [${pathway.join(', ')}]
+Files Recovered: ${results.length}
+
+═══════════════════════════════════════════════════════════════════
+                    🎉 CONGRATULATIONS! 🎉
+═══════════════════════════════════════════════════════════════════
+
+Your files have successfully emerged from their 4-shell cocoon!
+
+Like a butterfly breaking free, your data has traversed:
+  🐚 Shell 4 → Physical Layer (escaped!)
+  🐚 Shell 3 → Network Layer (freed!)  
+  🐚 Shell 2 → Transport Layer (liberated!)
+  🐚 Shell 1 → Application Layer (restored!)
+
+Total decryption time: ${totalTime}ms
+(Yes, that's milliseconds. We're fast like that. 🚀)
+
+═══════════════════════════════════════════════════════════════════
+                      FILES RECOVERED
+═══════════════════════════════════════════════════════════════════
+
+${fileList}
+
+═══════════════════════════════════════════════════════════════════
+                    📊 THE MATH CHECK 📊
+═══════════════════════════════════════════════════════════════════
+
+You used pathway [${pathway.join(', ')}]
+That's pathway #${pathwayId} out of 2,401 possible combinations.
+
+If someone tried to brute-force guess your pathway:
+  • Random guess success rate: 0.042% (1 in 2,401)
+  • Add the 64-character key: 1 in 2^256 × 2,401
+  • That's more combinations than atoms in the universe
+
+"They tried 666 combinations. We used 2,401." 😎
+
+═══════════════════════════════════════════════════════════════════
+                    🔐 SECURITY REMINDER 🔐  
+═══════════════════════════════════════════════════════════════════
+
+Now that your files are decrypted:
+
+  ✓ They're back to their original, unprotected state
+  ✓ Anyone with access can read them
+  ✓ Consider re-encrypting if storing in the cloud
+
+Want to protect them again? Visit:
+  → https://secure.sevencubedsevenlabs.com
+
+═══════════════════════════════════════════════════════════════════
+                   💡 DID YOU KNOW? 💡
+═══════════════════════════════════════════════════════════════════
+
+FACT #1: THE MATH OF IMPOSSIBILITY
+Most encryption uses 1 key. Patent #65 uses a key + pathway.
+With 2,401 pathways × 2²⁵⁶ key combinations, there are more 
+possible combinations than atoms in the observable universe.
+A brute-force attack at 1 trillion attempts/second would take
+longer than the age of the universe... times the age of the universe.
+
+FACT #2: WHY 7? THE COMPLETION NUMBER  
+Ancient builders knew: 6 is incomplete, 7 is complete.
+• 6³ + 6² + 6 = 258 (Babylon's number - incomplete)
+• 7⁴ = 2,401 (The Seal - complete protection)
+While others encrypt with 6-based systems, we complete with 7.
+
+FACT #3: THE 4-SHELL ARCHITECTURE
+Your file just traversed 4 cryptographic shells - mirroring the
+OSI network model. Each shell uses 7 transformation primitives.
+That's 7 × 7 × 7 × 7 = 2,401 unique encryption pathways.
+Pick the wrong one? The math collapses. Pick the right one? Magic.
+
+FACT #4: SPEED VS SECURITY PARADOX
+Decryption took ${totalTime}ms with the correct pathway + key.
+Without them? Estimated crack time: 10⁷⁷ years.
+That's the beauty of mathematical trapdoors - easy one way,
+impossible the other. Like unscrambling an egg... with math.
+
+FACT #5: THE THREE-LEGGED STOOL
+Traditional encryption = 1 key (knock out one leg, it falls)
+Patent #65 = File + Key + Pathway (a three-legged stool)
+Hackers need ALL THREE. Miss one? The stool doesn't stand.
+That's not security through obscurity - it's security through geometry.
+
+═══════════════════════════════════════════════════════════════════
+                         SUPPORT
+═══════════════════════════════════════════════════════════════════
+
+📧 Email: 7cubed7@proton.me
+📖 Docs: https://api.sevencubedsevenlabs.com/docs
+🌐 Web: https://sevencubedsevenlabs.com
+🔐 Encrypt: https://secure.sevencubedsevenlabs.com
+
+═══════════════════════════════════════════════════════════════════
+
+                    7³ × 7 = 2,401
+            The Seal Architecture • Patent Pending
+        
+       "From 4 shells to freedom - your data's journey"
+
+            🦋 Enjoy your decrypted files! 🦋
+
+═══════════════════════════════════════════════════════════════════
+`;
+        }
+
         // Download All as ZIP
         async function downloadAllAsZip() {
             if (encryptedResults.length === 0) return;
@@ -2357,7 +2503,9 @@
             const timestamp = new Date().toISOString().slice(0, 10);
 
             if (currentMode === 'decrypt') {
-                // DECRYPT MODE - Just add the decrypted files
+                // DECRYPT MODE - Add decrypted files + README
+                
+                // Add all decrypted files
                 for (const result of encryptedResults) {
                     try {
                         // Decode from base64
@@ -2372,6 +2520,10 @@
                         zip.file(result.name, result.plaintext);
                     }
                 }
+                
+                // Generate README for decrypted files
+                const decryptReadme = generateDecryptReadme(pathway, encryptedResults, timestamp);
+                zip.file('README.txt', decryptReadme);
                 
                 // Generate and download
                 const content = await zip.generateAsync({ type: 'blob' });
