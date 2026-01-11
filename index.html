@@ -1638,15 +1638,24 @@
             const keyFileInput = document.getElementById('keyFileInput');
             if (!keyFileInput) return;
             
-            keyFileInput.addEventListener('change', (e) => {
-                handleKeyFiles(e.target.files);
+            keyFileInput.addEventListener('change', async (e) => {
+                // Copy files before any async operations
+                const files = e.target.files;
+                if (files.length > 0) {
+                    await handleKeyFiles(files);
+                }
+                // Reset after processing complete
                 e.target.value = '';
             });
         }
 
         // Handle Key Files
         async function handleKeyFiles(files) {
-            for (const file of files) {
+            // CRITICAL: Convert FileList to Array to prevent issues with click-to-browse
+            const fileArray = Array.from(files);
+            
+            // Process all files
+            const promises = fileArray.map(async (file) => {
                 // Read key content
                 const keyContent = await file.text();
                 const trimmedKey = keyContent.trim();
@@ -1659,15 +1668,25 @@
                 
                 // Check if key already exists
                 if (keyFiles.some(k => k.name === baseName)) {
-                    continue;
+                    return null;
                 }
                 
-                keyFiles.push({
+                return {
                     name: baseName,
                     key: trimmedKey,
                     fileName: file.name
-                });
-            }
+                };
+            });
+            
+            // Wait for all files to be processed
+            const results = await Promise.all(promises);
+            
+            // Add non-null results to keyFiles
+            results.forEach(result => {
+                if (result) {
+                    keyFiles.push(result);
+                }
+            });
             
             updateKeyFilesList();
         }
