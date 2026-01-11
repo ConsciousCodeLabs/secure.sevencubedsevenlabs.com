@@ -2104,32 +2104,72 @@
 
         // Decrypt Single File
         async function decryptFile(file, pathway, key) {
-            // Read file content (should be hex ciphertext)
-            const ciphertext = await file.text();
-
-            const response = await fetch(`${API_BASE}/decrypt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(currentApiKey && { 'X-API-Key': currentApiKey })
-                },
-                body: JSON.stringify({
-                    ciphertext: ciphertext.trim(),
-                    key: key,
+            try {
+                // Read file content (should be hex ciphertext)
+                console.log(`[Decrypt] Reading file: ${file.name} (${file.size} bytes)`);
+                const ciphertext = await file.text();
+                
+                // Clean the ciphertext - remove any whitespace, newlines, BOM
+                const cleanCiphertext = ciphertext.trim().replace(/[\r\n\s]/g, '');
+                console.log(`[Decrypt] Ciphertext length: ${cleanCiphertext.length} chars`);
+                
+                // Validate hex format
+                if (!/^[0-9a-fA-F]+$/.test(cleanCiphertext)) {
+                    throw new Error('Invalid encrypted file format - not valid hex data');
+                }
+                
+                // Validate key format
+                const cleanKey = key.trim();
+                if (!/^[0-9a-fA-F]{64}$/.test(cleanKey)) {
+                    throw new Error('Invalid key format - must be 64 hex characters');
+                }
+                
+                console.log(`[Decrypt] Sending to API with pathway: [${pathway.join(', ')}]`);
+                
+                const requestBody = JSON.stringify({
+                    ciphertext: cleanCiphertext,
+                    key: cleanKey,
                     pathway: pathway
-                })
-            });
+                });
+                
+                console.log(`[Decrypt] Request body size: ${requestBody.length} bytes`);
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Decryption failed');
+                const response = await fetch(`${API_BASE}/decrypt`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(currentApiKey && { 'X-API-Key': currentApiKey })
+                    },
+                    body: requestBody
+                });
+
+                console.log(`[Decrypt] Response status: ${response.status}`);
+
+                if (!response.ok) {
+                    let errorMessage = 'Decryption failed';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.detail || error.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log(`[Decrypt] Success! Decryption time: ${result.decryption_time_ms}ms`);
+                
+                // Note: Decrypt is FREE - no usage tracking
+                
+                return result;
+            } catch (error) {
+                console.error(`[Decrypt] Error:`, error);
+                // Re-throw with more context
+                if (error.message === 'Load failed' || error.message === 'Failed to fetch') {
+                    throw new Error('Network error - check your connection and try again. If the file is very large, this may take a moment.');
+                }
+                throw error;
             }
-
-            const result = await response.json();
-            
-            // Note: Decrypt is FREE - no usage tracking
-            
-            return result;
         }
 
         // Encrypt Single File
