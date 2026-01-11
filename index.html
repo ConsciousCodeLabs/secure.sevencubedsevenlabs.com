@@ -466,6 +466,30 @@
             font-size: 0.8rem;
         }
 
+        .file-queue-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-retry-failed {
+            background: var(--warning);
+            border: none;
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            font-weight: 600;
+        }
+
+        .btn-retry-failed:hover, .btn-retry-failed:active {
+            background: #e6a817;
+            transform: scale(1.02);
+        }
+
         .btn-clear-all {
             background: transparent;
             border: 1px solid var(--border);
@@ -1365,7 +1389,10 @@
                             📋 Files to Encrypt
                             <span class="file-count" id="fileCount" aria-label="Number of files">0</span>
                         </div>
-                        <button class="btn-clear-all" onclick="clearAllFiles()" aria-label="Clear all files">Clear All</button>
+                        <div class="file-queue-actions">
+                            <button class="btn-retry-failed" id="retryFailedBtn" onclick="resetErrors()" style="display: none;" aria-label="Retry failed files">🔄 Retry Failed</button>
+                            <button class="btn-clear-all" onclick="clearAllFiles()" aria-label="Clear all files">Clear All</button>
+                        </div>
                     </div>
                     <div class="file-list" id="fileList" role="list"></div>
                 </section>
@@ -1654,11 +1681,36 @@
             // CRITICAL: Convert FileList to Array to prevent issues with click-to-browse
             const fileArray = Array.from(files);
             
-            // Process all files
-            const promises = fileArray.map(async (file) => {
+            // Filter and validate .key files
+            const validFiles = [];
+            const rejectedFiles = [];
+            
+            for (const file of fileArray) {
+                if (!file.name.toLowerCase().endsWith('.key')) {
+                    rejectedFiles.push(file.name);
+                } else {
+                    validFiles.push(file);
+                }
+            }
+            
+            // Alert user about rejected files
+            if (rejectedFiles.length > 0) {
+                alert(`⚠️ Invalid key file(s) rejected:\n\n${rejectedFiles.join('\n')}\n\nKey files must end with .key extension`);
+            }
+            
+            if (validFiles.length === 0) return;
+            
+            // Process valid files
+            const promises = validFiles.map(async (file) => {
                 // Read key content
                 const keyContent = await file.text();
                 const trimmedKey = keyContent.trim();
+                
+                // Validate key format (64 hex characters)
+                if (!/^[0-9a-fA-F]{64}$/.test(trimmedKey)) {
+                    console.warn(`[Keys] Invalid key format in ${file.name}: ${trimmedKey.length} chars`);
+                    return { error: true, name: file.name, reason: 'not 64 hex characters' };
+                }
                 
                 // Extract base filename (remove .key extension)
                 let baseName = file.name;
@@ -1681,9 +1733,15 @@
             // Wait for all files to be processed
             const results = await Promise.all(promises);
             
-            // Add non-null results to keyFiles
+            // Check for invalid key format errors
+            const invalidKeys = results.filter(r => r && r.error);
+            if (invalidKeys.length > 0) {
+                alert(`⚠️ Invalid key content:\n\n${invalidKeys.map(k => `${k.name}: ${k.reason}`).join('\n')}\n\nKeys must be exactly 64 hex characters.`);
+            }
+            
+            // Add non-null, non-error results to keyFiles
             results.forEach(result => {
-                if (result) {
+                if (result && !result.error) {
                     keyFiles.push(result);
                 }
             });
@@ -1795,11 +1853,16 @@
         }
 
         // Handle Files
-        function handleFiles(files) {
+        async function handleFiles(files) {
             const maxSize = getMaxFileSize();
             const maxSizeMB = getMaxFileSizeMB();
             
+            // In decrypt mode, validate .encrypted extension
+            const rejectedFiles = [];
+            const validFiles = [];
+            
             for (const file of files) {
+                // Check file size first
                 if (file.size > maxSize) {
                     if (currentTier === 'free') {
                         alert(`📁 File "${file.name}" exceeds ${maxSizeMB}MB limit.\n\n🚀 Upgrade to Starter for 50MB\n👑 Or Enterprise for 100MB files!\n\nThe ARK has room, but you need a bigger ticket!`);
@@ -1811,9 +1874,39 @@
                     continue;
                 }
 
+                // In decrypt mode, require .encrypted extension
+                if (currentMode === 'decrypt' && !file.name.toLowerCase().endsWith('.encrypted')) {
+                    rejectedFiles.push(file.name);
+                    continue;
+                }
+
                 // Check if file already in queue
                 if (filesToEncrypt.some(f => f.name === file.name && f.size === file.size)) {
                     continue;
+                }
+                
+                validFiles.push(file);
+            }
+            
+            // Alert about rejected files in decrypt mode
+            if (rejectedFiles.length > 0) {
+                alert(`⚠️ Invalid file(s) rejected:\n\n${rejectedFiles.join('\n')}\n\nIn Decrypt mode, files must end with .encrypted extension.\n\n💡 Tip: Encrypted files are created with .encrypted extension when you encrypt.`);
+            }
+
+            // Process valid files
+            for (const file of validFiles) {
+                // Read file content immediately to avoid stale File object issues (v2 fix)
+                let fileContent = null;
+                if (currentMode === 'decrypt') {
+                    try {
+                        console.log(`[Queue] Reading content for: ${file.name}`);
+                        fileContent = await file.text();
+                        console.log(`[Queue] Read ${fileContent.length} chars from ${file.name}`);
+                    } catch (err) {
+                        console.error(`[Queue] Failed to read ${file.name}:`, err);
+                        alert(`Failed to read file: ${file.name}\n\nTry uploading again.`);
+                        continue;
+                    }
                 }
 
                 filesToEncrypt.push({
@@ -1822,7 +1915,8 @@
                     size: file.size,
                     status: 'pending',
                     progress: 0,
-                    result: null
+                    result: null,
+                    content: fileContent  // Store content for decrypt mode (v2 fix)
                 });
             }
 
@@ -1835,6 +1929,7 @@
             const queueEl = document.getElementById('fileQueue');
             const listEl = document.getElementById('fileList');
             const countEl = document.getElementById('fileCount');
+            const retryBtn = document.getElementById('retryFailedBtn');
 
             if (filesToEncrypt.length === 0) {
                 queueEl.style.display = 'none';
@@ -1843,6 +1938,12 @@
 
             queueEl.style.display = 'block';
             countEl.textContent = filesToEncrypt.length;
+            
+            // Show/hide retry button based on whether there are errors
+            const hasErrors = filesToEncrypt.some(f => f.status === 'error');
+            if (retryBtn) {
+                retryBtn.style.display = hasErrors ? 'inline-block' : 'none';
+            }
 
             listEl.innerHTML = filesToEncrypt.map((item, index) => `
                 <div class="file-item" id="file-${index}" role="listitem">
@@ -1889,6 +1990,24 @@
             document.getElementById('resultsSection').classList.remove('active');
             document.getElementById('batchProgress').classList.remove('active');
             document.getElementById('downloadBtn').disabled = true;
+        }
+
+        // Reset Error Status - allows retry without clearing files
+        function resetErrors() {
+            let errorsReset = 0;
+            for (const item of filesToEncrypt) {
+                if (item.status === 'error') {
+                    item.status = 'pending';
+                    item.progress = 0;
+                    errorsReset++;
+                }
+            }
+            if (errorsReset > 0) {
+                console.log(`[Reset] Reset ${errorsReset} files from error to pending`);
+                updateFileQueue();
+                updateEncryptButton();
+            }
+            return errorsReset;
         }
 
         // Update Encrypt Button State
@@ -2055,7 +2174,8 @@
                         throw new Error('No decryption key found for this file');
                     }
                     
-                    const result = await decryptFile(item.file, pathway, key);
+                    // Use stored content if available (prevents stale File object issues)
+                    const result = await decryptFile(item.content || item.file, pathway, key, item.name);
                     item.status = 'done';
                     item.progress = 100;
                     item.result = result;
@@ -2076,7 +2196,8 @@
                     item.status = 'error';
                     item.progress = 0;
                     console.error(`Error decrypting ${item.name}:`, error);
-                    alert(`Error decrypting ${item.name}: ${error.message}`);
+                    // Show error but don't block - allow other files to continue
+                    alert(`Error decrypting ${item.name}: ${error.message}\n\nYou can retry by clicking "Decrypt Files" again after errors are cleared.`);
                 }
 
                 updateFileQueue();
@@ -2103,11 +2224,19 @@
         }
 
         // Decrypt Single File
-        async function decryptFile(file, pathway, key) {
+        async function decryptFile(fileOrContent, pathway, key, fileName = 'unknown') {
             try {
-                // Read file content (should be hex ciphertext)
-                console.log(`[Decrypt] Reading file: ${file.name} (${file.size} bytes)`);
-                const ciphertext = await file.text();
+                // Get ciphertext - either from stored content (string) or read from File object
+                let ciphertext;
+                if (typeof fileOrContent === 'string') {
+                    // Content was pre-read and stored
+                    console.log(`[Decrypt] Using stored content for: ${fileName}`);
+                    ciphertext = fileOrContent;
+                } else {
+                    // Read from File object (fallback)
+                    console.log(`[Decrypt] Reading file: ${fileOrContent.name} (${fileOrContent.size} bytes)`);
+                    ciphertext = await fileOrContent.text();
+                }
                 
                 // Clean the ciphertext - remove any whitespace, newlines, BOM
                 const cleanCiphertext = ciphertext.trim().replace(/[\r\n\s]/g, '');
@@ -2118,10 +2247,10 @@
                     throw new Error('Invalid encrypted file format - not valid hex data');
                 }
                 
-                // Validate key format
+                // Validate and clean key format
                 const cleanKey = key.trim();
                 if (!/^[0-9a-fA-F]{64}$/.test(cleanKey)) {
-                    throw new Error('Invalid key format - must be 64 hex characters');
+                    throw new Error(`Invalid key format - must be 64 hex characters (got ${cleanKey.length})`);
                 }
                 
                 console.log(`[Decrypt] Sending to API with pathway: [${pathway.join(', ')}]`);
@@ -2166,7 +2295,7 @@
                 console.error(`[Decrypt] Error:`, error);
                 // Re-throw with more context
                 if (error.message === 'Load failed' || error.message === 'Failed to fetch') {
-                    throw new Error('Network error - check your connection and try again. If the file is very large, this may take a moment.');
+                    throw new Error('Network error - please check your connection and try again');
                 }
                 throw error;
             }
