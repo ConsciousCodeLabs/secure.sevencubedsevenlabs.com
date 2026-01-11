@@ -1096,6 +1096,10 @@
             margin-top: 0.5rem;
         }
 
+        #keyFileInput {
+            display: none !important;
+        }
+
         /* Decrypt mode styling */
         body.decrypt-mode .drop-zone {
             border-color: rgba(245, 158, 11, 0.4);
@@ -1335,7 +1339,7 @@
                         <div class="key-drop-zone-text">Drop .key files here</div>
                         <div class="key-drop-zone-hint">or click to browse • Multiple keys supported!</div>
                     </div>
-                    <input type="file" id="keyFileInput" multiple accept=".key,.txt" aria-hidden="true">
+                    <input type="file" id="keyFileInput" class="hidden-input" multiple accept=".key,.txt" aria-hidden="true">
                     
                     <!-- Key Files List -->
                     <div class="key-files-list" id="keyFilesList" style="display: none;"></div>
