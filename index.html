@@ -900,6 +900,234 @@
             display: none;
         }
 
+        /* Mode Toggle (Encrypt/Decrypt) */
+        .mode-toggle {
+            display: flex;
+            background: var(--dark);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 1.25rem;
+            gap: 4px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            border: none;
+            background: transparent;
+            color: var(--gray);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .mode-btn:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .mode-btn.active {
+            background: var(--gradient);
+            color: var(--white);
+        }
+
+        .mode-btn.active.decrypt {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+        }
+
+        .mode-btn-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Key Section (Decrypt Mode) */
+        .key-section {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            display: none;
+        }
+
+        .key-section.active {
+            display: block;
+        }
+
+        .key-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .key-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--warning);
+        }
+
+        .key-drop-zone {
+            border: 2px dashed rgba(245, 158, 11, 0.4);
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 0.75rem;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .key-drop-zone:hover, .key-drop-zone.drag-over {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .key-drop-zone-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .key-drop-zone-text {
+            font-size: 0.9rem;
+            color: var(--warning);
+            font-weight: 500;
+        }
+
+        .key-drop-zone-hint {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+
+        .key-files-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .key-file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .key-file-item:last-child {
+            border-bottom: none;
+        }
+
+        .key-file-item .match-status {
+            margin-left: auto;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .key-file-item .match-status.matched {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent);
+        }
+
+        .key-file-item .match-status.unmatched {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .key-input-divider {
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.8rem;
+            margin: 0.75rem 0;
+            position: relative;
+        }
+
+        .key-input-divider::before,
+        .key-input-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .key-input-divider::before { left: 0; }
+        .key-input-divider::after { right: 0; }
+
+        .key-textarea {
+            width: 100%;
+            background: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--white);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .key-textarea:focus {
+            outline: none;
+            border-color: var(--warning);
+        }
+
+        .key-textarea::placeholder {
+            color: var(--gray);
+        }
+
+        .key-hint {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.5rem;
+        }
+
+        /* Decrypt mode styling */
+        body.decrypt-mode .drop-zone {
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        body.decrypt-mode .drop-zone:hover,
+        body.decrypt-mode .drop-zone.drag-over {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        body.decrypt-mode .btn-encrypt {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+        }
+
+        body.decrypt-mode .batch-progress-fill {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+        }
+
+        body.decrypt-mode .results-section {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--warning);
+        }
+
+        body.decrypt-mode .results-title {
+            color: var(--warning);
+        }
+
+        body.decrypt-mode .preset-buttons {
+            display: none;
+        }
+
         /* Animations */
         @keyframes spin {
             from { transform: rotate(0deg); }
@@ -1037,6 +1265,18 @@
                     <p class="fun-fact">Fun fact: 7³ × 7 = 2,401 = Complete Protection (unlike 666... that's missing a shell 😏)</p>
                 </div>
 
+                <!-- Mode Toggle (Encrypt/Decrypt) -->
+                <div class="mode-toggle" role="tablist" aria-label="Encryption mode">
+                    <button class="mode-btn active" id="encryptModeBtn" onclick="setMode('encrypt')" role="tab" aria-selected="true" aria-controls="encryptPanel">
+                        <span class="mode-btn-icon">🔒</span>
+                        <span>Encrypt</span>
+                    </button>
+                    <button class="mode-btn" id="decryptModeBtn" onclick="setMode('decrypt')" role="tab" aria-selected="false" aria-controls="decryptPanel">
+                        <span class="mode-btn-icon">🔓</span>
+                        <span>Decrypt</span>
+                    </button>
+                </div>
+
                 <!-- API Key Section -->
                 <section class="api-key-section" id="apiKeySection" aria-labelledby="apiKeyTitle">
                     <div class="api-key-header">
@@ -1076,6 +1316,43 @@
                     <div class="drop-zone-joke">Your files enter 4 shells. Hackers enter despair. 🐚🐚🐚🐚</div>
                 </div>
                 <input type="file" id="fileInput" multiple aria-hidden="true">
+
+                <!-- Key Section (Decrypt Mode Only) -->
+                <section class="key-section" id="keySection" aria-labelledby="keySectionTitle">
+                    <div class="key-section-header">
+                        <div class="key-section-title" id="keySectionTitle">🔑 Decryption Keys</div>
+                        <button class="btn-clear-all" onclick="clearAllKeys()" aria-label="Clear all keys">Clear Keys</button>
+                    </div>
+                    
+                    <!-- Key File Drop Zone -->
+                    <div class="key-drop-zone" 
+                         id="keyDropZone" 
+                         onclick="document.getElementById('keyFileInput').click()"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Click or drag key files to upload">
+                        <div class="key-drop-zone-icon">🔑</div>
+                        <div class="key-drop-zone-text">Drop .key files here</div>
+                        <div class="key-drop-zone-hint">or click to browse • Multiple keys supported!</div>
+                    </div>
+                    <input type="file" id="keyFileInput" multiple accept=".key,.txt" aria-hidden="true">
+                    
+                    <!-- Key Files List -->
+                    <div class="key-files-list" id="keyFilesList" style="display: none;"></div>
+                    
+                    <!-- OR divider -->
+                    <div class="key-input-divider">— OR paste single key —</div>
+                    
+                    <!-- Manual Key Input -->
+                    <textarea class="key-textarea" 
+                              id="manualKeyInput" 
+                              placeholder="Paste your decryption key here (64 hex characters)..."
+                              aria-label="Manual key input"></textarea>
+                    
+                    <div class="key-hint">
+                        💡 <strong>Tip:</strong> Upload multiple .key files and they'll auto-match with your .encrypted files by filename!
+                    </div>
+                </section>
 
                 <!-- File Queue -->
                 <section class="file-queue" id="fileQueue" style="display: none;" aria-labelledby="fileQueueTitle">
@@ -1232,6 +1509,8 @@
         let usageCount = 0;
         let filesToEncrypt = [];
         let encryptedResults = [];
+        let currentMode = 'encrypt'; // 'encrypt' or 'decrypt'
+        let keyFiles = []; // For decrypt mode - stores {name, key} objects
         
         // Get current file size limit based on tier
         function getMaxFileSize() {
@@ -1246,12 +1525,212 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupDropZone();
             setupFileInput();
+            setupKeyDropZone();
+            setupKeyFileInput();
             if (currentApiKey) {
                 document.getElementById('apiKeyInput').value = currentApiKey;
                 validateApiKey(currentApiKey);
             }
             updatePathwayDisplay();
         });
+
+        // Mode Toggle
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update body class
+            document.body.classList.toggle('decrypt-mode', mode === 'decrypt');
+            
+            // Update mode buttons
+            const encryptBtn = document.getElementById('encryptModeBtn');
+            const decryptBtn = document.getElementById('decryptModeBtn');
+            
+            encryptBtn.classList.toggle('active', mode === 'encrypt');
+            decryptBtn.classList.toggle('active', mode === 'decrypt');
+            decryptBtn.classList.toggle('decrypt', mode === 'decrypt');
+            
+            encryptBtn.setAttribute('aria-selected', mode === 'encrypt');
+            decryptBtn.setAttribute('aria-selected', mode === 'decrypt');
+            
+            // Show/hide key section
+            document.getElementById('keySection').classList.toggle('active', mode === 'decrypt');
+            
+            // Update drop zone text
+            const dropZone = document.getElementById('dropZone');
+            const dropZoneIcon = dropZone.querySelector('.drop-zone-icon');
+            const dropZoneText = dropZone.querySelector('.drop-zone-text');
+            const dropZoneHint = dropZone.querySelector('.drop-zone-hint');
+            const dropZoneJoke = dropZone.querySelector('.drop-zone-joke');
+            
+            if (mode === 'decrypt') {
+                dropZoneIcon.textContent = '🔐';
+                dropZoneText.textContent = 'Drag & drop encrypted files here';
+                dropZoneHint.innerHTML = `or click to browse • .encrypted files<br><span class="batch-hint">✨ Batch decryption supported!</span>`;
+                dropZoneJoke.textContent = 'Time to unwrap your protected treasures! 🎁';
+            } else {
+                dropZoneIcon.textContent = '📁';
+                dropZoneText.textContent = 'Drag & drop files here';
+                dropZoneHint.innerHTML = `or click to browse • Max <span id="maxFileSizeDisplay">${getMaxFileSizeMB()}MB</span> per file<br><span class="batch-hint">✨ Multiple files supported!</span>`;
+                dropZoneJoke.textContent = 'Your files enter 4 shells. Hackers enter despair. 🐚🐚🐚🐚';
+            }
+            
+            // Update file queue title
+            document.getElementById('fileQueueTitle').innerHTML = mode === 'decrypt' 
+                ? '📋 Files to Decrypt <span class="file-count" id="fileCount">0</span>'
+                : '📋 Files to Encrypt <span class="file-count" id="fileCount">0</span>';
+            
+            // Update action button
+            updateEncryptButton();
+            
+            // Update results section title
+            document.querySelector('.results-title').textContent = mode === 'decrypt' 
+                ? '✅ Decryption Complete!' 
+                : '✅ Encryption Complete!';
+            
+            // Clear files when switching modes
+            clearAllFiles();
+            clearAllKeys();
+        }
+
+        // Key Drop Zone Setup
+        function setupKeyDropZone() {
+            const keyDropZone = document.getElementById('keyDropZone');
+            if (!keyDropZone) return;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                keyDropZone.addEventListener(eventName, preventKeyDefaults, false);
+            });
+
+            function preventKeyDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                keyDropZone.addEventListener(eventName, () => {
+                    keyDropZone.classList.add('drag-over');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                keyDropZone.addEventListener(eventName, () => {
+                    keyDropZone.classList.remove('drag-over');
+                }, false);
+            });
+
+            keyDropZone.addEventListener('drop', (e) => {
+                handleKeyFiles(e.dataTransfer.files);
+            }, false);
+            
+            keyDropZone.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('keyFileInput').click();
+                }
+            });
+        }
+
+        // Key File Input Setup
+        function setupKeyFileInput() {
+            const keyFileInput = document.getElementById('keyFileInput');
+            if (!keyFileInput) return;
+            
+            keyFileInput.addEventListener('change', (e) => {
+                handleKeyFiles(e.target.files);
+                e.target.value = '';
+            });
+        }
+
+        // Handle Key Files
+        async function handleKeyFiles(files) {
+            for (const file of files) {
+                // Read key content
+                const keyContent = await file.text();
+                const trimmedKey = keyContent.trim();
+                
+                // Extract base filename (remove .key extension)
+                let baseName = file.name;
+                if (baseName.endsWith('.key')) {
+                    baseName = baseName.slice(0, -4);
+                }
+                
+                // Check if key already exists
+                if (keyFiles.some(k => k.name === baseName)) {
+                    continue;
+                }
+                
+                keyFiles.push({
+                    name: baseName,
+                    key: trimmedKey,
+                    fileName: file.name
+                });
+            }
+            
+            updateKeyFilesList();
+        }
+
+        // Update Key Files List UI
+        function updateKeyFilesList() {
+            const listEl = document.getElementById('keyFilesList');
+            
+            if (keyFiles.length === 0) {
+                listEl.style.display = 'none';
+                return;
+            }
+            
+            listEl.style.display = 'block';
+            
+            listEl.innerHTML = keyFiles.map((keyFile, index) => {
+                // Check if there's a matching encrypted file
+                const hasMatch = filesToEncrypt.some(f => {
+                    const encryptedBase = f.name.replace('.encrypted', '');
+                    return encryptedBase === keyFile.name;
+                });
+                
+                return `
+                    <div class="key-file-item">
+                        <span>🔑</span>
+                        <span>${escapeHtml(keyFile.fileName)}</span>
+                        <span class="match-status ${hasMatch ? 'matched' : 'unmatched'}">
+                            ${hasMatch ? '✓ matched' : '⚠ no match'}
+                        </span>
+                        <button class="file-remove" onclick="removeKeyFile(${index})" aria-label="Remove key">×</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Remove Key File
+        function removeKeyFile(index) {
+            keyFiles.splice(index, 1);
+            updateKeyFilesList();
+        }
+
+        // Clear All Keys
+        function clearAllKeys() {
+            keyFiles = [];
+            document.getElementById('manualKeyInput').value = '';
+            updateKeyFilesList();
+        }
+
+        // Get Key for File (filename matching)
+        function getKeyForFile(fileName) {
+            // Remove .encrypted extension
+            const baseName = fileName.replace('.encrypted', '');
+            
+            // First check uploaded key files
+            const matchedKey = keyFiles.find(k => k.name === baseName);
+            if (matchedKey) {
+                return matchedKey.key;
+            }
+            
+            // Fall back to manual input
+            const manualKey = document.getElementById('manualKeyInput').value.trim();
+            if (manualKey && manualKey.length === 64) {
+                return manualKey;
+            }
+            
+            return null;
+        }
 
         // Drop Zone Setup
         function setupDropZone() {
@@ -1395,17 +1874,37 @@
             const pendingFiles = filesToEncrypt.filter(f => f.status === 'pending').length;
             btn.disabled = pendingFiles === 0;
             
-            if (pendingFiles === 0) {
-                btn.textContent = '🔒 Encrypt Files';
-            } else if (pendingFiles === 1) {
-                btn.textContent = '🔒 Encrypt 1 File';
+            if (currentMode === 'decrypt') {
+                if (pendingFiles === 0) {
+                    btn.textContent = '🔓 Decrypt Files';
+                } else if (pendingFiles === 1) {
+                    btn.textContent = '🔓 Decrypt 1 File';
+                } else {
+                    btn.textContent = `🔓 Decrypt ${pendingFiles} Files`;
+                }
             } else {
-                btn.textContent = `🔒 Encrypt ${pendingFiles} Files`;
+                if (pendingFiles === 0) {
+                    btn.textContent = '🔒 Encrypt Files';
+                } else if (pendingFiles === 1) {
+                    btn.textContent = '🔒 Encrypt 1 File';
+                } else {
+                    btn.textContent = `🔒 Encrypt ${pendingFiles} Files`;
+                }
+            }
+            
+            // Also update key files match status
+            if (currentMode === 'decrypt') {
+                updateKeyFilesList();
             }
         }
 
-        // Encrypt All Files
+        // Encrypt/Decrypt All Files
         async function encryptAllFiles() {
+            if (currentMode === 'decrypt') {
+                await decryptAllFiles();
+                return;
+            }
+            
             const pendingFiles = filesToEncrypt.filter(f => f.status === 'pending');
             if (pendingFiles.length === 0) return;
 
@@ -1415,6 +1914,8 @@
             // Show progress
             const progressEl = document.getElementById('batchProgress');
             progressEl.classList.add('active');
+            document.querySelector('.batch-progress-text').textContent = '🔄 Encrypting through 4 shells...';
+            document.querySelector('.progress-joke').textContent = 'Each file traversing 2,401 dimensions of protection...';
             document.getElementById('resultsSection').classList.remove('active');
             document.getElementById('encryptBtn').disabled = true;
             document.getElementById('progressTotal').textContent = pendingFiles.length;
@@ -1474,6 +1975,140 @@
             updateEncryptButton();
         }
 
+        // Decrypt All Files
+        async function decryptAllFiles() {
+            const pendingFiles = filesToEncrypt.filter(f => f.status === 'pending');
+            if (pendingFiles.length === 0) return;
+
+            const pathway = getPathway();
+            encryptedResults = []; // Reuse for decrypted results
+
+            // Validate that we have keys for files
+            const manualKey = document.getElementById('manualKeyInput').value.trim();
+            let missingKeys = [];
+            
+            for (const item of pendingFiles) {
+                const key = getKeyForFile(item.name);
+                if (!key) {
+                    missingKeys.push(item.name);
+                }
+            }
+            
+            if (missingKeys.length > 0 && !manualKey) {
+                alert(`Missing keys for:\n${missingKeys.join('\n')}\n\nPlease upload .key files or paste a key manually.`);
+                return;
+            }
+
+            // Show progress
+            const progressEl = document.getElementById('batchProgress');
+            progressEl.classList.add('active');
+            document.querySelector('.batch-progress-text').textContent = '🔓 Decrypting through 4 shells...';
+            document.querySelector('.progress-joke').textContent = 'Reversing the 2,401-dimensional journey...';
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('encryptBtn').disabled = true;
+            document.getElementById('progressTotal').textContent = pendingFiles.length;
+
+            let completedCount = 0;
+
+            for (let i = 0; i < filesToEncrypt.length; i++) {
+                const item = filesToEncrypt[i];
+                if (item.status !== 'pending') continue;
+
+                // Update progress
+                document.getElementById('progressCurrent').textContent = completedCount + 1;
+                const progressPercent = (completedCount / pendingFiles.length) * 100;
+                document.getElementById('progressFill').style.width = `${progressPercent}%`;
+                progressEl.setAttribute('aria-valuenow', progressPercent);
+
+                // Update file status
+                item.status = 'encrypting'; // Reuse status
+                item.progress = 50;
+                updateFileQueue();
+
+                try {
+                    // Get key for this file
+                    const key = getKeyForFile(item.name);
+                    if (!key) {
+                        throw new Error('No decryption key found for this file');
+                    }
+                    
+                    const result = await decryptFile(item.file, pathway, key);
+                    item.status = 'done';
+                    item.progress = 100;
+                    item.result = result;
+                    
+                    // Store result with original filename (without .encrypted)
+                    let originalName = item.name;
+                    if (originalName.endsWith('.encrypted')) {
+                        originalName = originalName.slice(0, -10);
+                    }
+                    
+                    encryptedResults.push({
+                        name: originalName,
+                        plaintext: result.plaintext,
+                        decryptionTime: result.decryption_time_ms
+                    });
+                    completedCount++;
+                } catch (error) {
+                    item.status = 'error';
+                    item.progress = 0;
+                    console.error(`Error decrypting ${item.name}:`, error);
+                    alert(`Error decrypting ${item.name}: ${error.message}`);
+                }
+
+                updateFileQueue();
+            }
+
+            // Complete
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressCurrent').textContent = completedCount;
+
+            // Show results
+            setTimeout(() => {
+                progressEl.classList.remove('active');
+                if (encryptedResults.length > 0) {
+                    document.getElementById('resultsSection').classList.add('active');
+                    document.querySelector('.results-title').textContent = '✅ Decryption Complete!';
+                    document.getElementById('resultsSummary').textContent = 
+                        `${encryptedResults.length} file${encryptedResults.length > 1 ? 's' : ''} decrypted with pathway [${pathway.join(', ')}] • Unwrapped from 4 shells 🎁`;
+                    document.querySelector('.results-joke').textContent = 'Your files have been safely unwrapped from their 4-shell cocoon! 🦋';
+                    document.getElementById('downloadBtn').disabled = false;
+                }
+            }, 500);
+
+            updateEncryptButton();
+        }
+
+        // Decrypt Single File
+        async function decryptFile(file, pathway, key) {
+            // Read file content (should be hex ciphertext)
+            const ciphertext = await file.text();
+
+            const response = await fetch(`${API_BASE}/decrypt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(currentApiKey && { 'X-API-Key': currentApiKey })
+                },
+                body: JSON.stringify({
+                    ciphertext: ciphertext.trim(),
+                    key: key,
+                    pathway: pathway
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Decryption failed');
+            }
+
+            const result = await response.json();
+            
+            // Note: Decrypt is FREE - no usage tracking
+            
+            return result;
+        }
+
         // Encrypt Single File
         async function encryptFile(file, pathway) {
             // Read file as base64
@@ -1529,6 +2164,37 @@
             const pathway = getPathway();
             const timestamp = new Date().toISOString().slice(0, 10);
 
+            if (currentMode === 'decrypt') {
+                // DECRYPT MODE - Just add the decrypted files
+                for (const result of encryptedResults) {
+                    try {
+                        // Decode from base64
+                        const binaryString = atob(result.plaintext);
+                        const bytes = new Uint8Array(binaryString.length);
+                        for (let i = 0; i < binaryString.length; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        zip.file(result.name, bytes);
+                    } catch (e) {
+                        // If not base64, try as plain text
+                        zip.file(result.name, result.plaintext);
+                    }
+                }
+                
+                // Generate and download
+                const content = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `patent65_decrypted_${timestamp}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                return;
+            }
+
+            // ENCRYPT MODE - Full package with folders
             // Create folders
             const encryptedFolder = zip.folder('encrypted_files');
             const keysFolder = zip.folder('keys');
