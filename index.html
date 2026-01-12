@@ -2439,21 +2439,21 @@ To decrypt ANY file, you need ALL THREE:
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '∞';
                 usageLabel.textContent = 'unlimited';
-                maxFileSizeDisplay.textContent = '100MB';
+                if (maxFileSizeDisplay) maxFileSizeDisplay.textContent = '100MB';
             } else if (tier === 'starter') {
                 tierIcon.textContent = '⭐';
                 tierName.textContent = 'Starter Plan';
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '50,000';
                 usageLabel.textContent = 'encryptions this month';
-                maxFileSizeDisplay.textContent = '50MB';
+                if (maxFileSizeDisplay) maxFileSizeDisplay.textContent = '50MB';
             } else {
                 tierIcon.textContent = '🆓';
                 tierName.textContent = 'Free Tier';
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '100';
                 usageLabel.textContent = 'encryptions today';
-                maxFileSizeDisplay.textContent = '10MB';
+                if (maxFileSizeDisplay) maxFileSizeDisplay.textContent = '10MB';
             }
 
             usageCount = usage?.current || 0;
