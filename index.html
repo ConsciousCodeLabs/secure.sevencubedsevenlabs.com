@@ -561,10 +561,19 @@
             font-size: 1rem;
         }
 
+        .status-icon.loading { 
+            color: var(--primary); 
+            animation: pulse 1s ease-in-out infinite;
+        }
         .status-icon.pending { color: var(--gray); }
         .status-icon.encrypting { color: var(--warning); }
         .status-icon.done { color: var(--accent); }
         .status-icon.error { color: var(--error); }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
 
         .file-progress {
             width: 60px;
@@ -1916,35 +1925,48 @@
                 alert(`⚠️ Invalid file(s) rejected:\n\n${rejectedFiles.join('\n')}\n\nIn Decrypt mode, files must end with .encrypted extension.\n\n💡 Tip: Encrypted files are created with .encrypted extension when you encrypt.`);
             }
 
-            // Process valid files
+            // STEP 1: Add all files to queue with 'loading' status IMMEDIATELY
+            const newItems = [];
             for (const file of validFiles) {
-                // Read file content immediately to avoid stale File object issues (v2 fix)
-                let fileContent = null;
-                if (currentMode === 'decrypt') {
-                    try {
-                        console.log(`[Queue] Reading content for: ${file.name}`);
-                        fileContent = await file.text();
-                        console.log(`[Queue] Read ${fileContent.length} chars from ${file.name}`);
-                    } catch (err) {
-                        console.error(`[Queue] Failed to read ${file.name}:`, err);
-                        alert(`Failed to read file: ${file.name}\n\nTry uploading again.`);
-                        continue;
-                    }
-                }
-
-                filesToEncrypt.push({
+                const item = {
                     file: file,
                     name: file.name,
                     size: file.size,
-                    status: 'pending',
+                    status: currentMode === 'decrypt' ? 'loading' : 'pending',  // Loading for decrypt
                     progress: 0,
                     result: null,
-                    content: fileContent  // Store content for decrypt mode (v2 fix)
-                });
+                    content: null  // Will be filled async for decrypt
+                };
+                filesToEncrypt.push(item);
+                newItems.push(item);
             }
-
+            
+            // Update UI immediately to show files are in queue (with loading status)
             updateFileQueue();
             updateEncryptButton();
+
+            // STEP 2: Read content asynchronously for decrypt mode
+            if (currentMode === 'decrypt' && newItems.length > 0) {
+                console.log(`[Queue] Reading content for ${newItems.length} files...`);
+                
+                // Read all files in parallel
+                await Promise.all(newItems.map(async (item) => {
+                    try {
+                        console.log(`[Queue] Reading: ${item.name}`);
+                        item.content = await item.file.text();
+                        console.log(`[Queue] Read ${item.content.length} chars from ${item.name}`);
+                        item.status = 'pending';  // Ready for decrypt
+                    } catch (err) {
+                        console.error(`[Queue] Failed to read ${item.name}:`, err);
+                        item.status = 'error';
+                        item.content = null;
+                    }
+                    updateFileQueue();  // Update UI as each file completes
+                }));
+                
+                console.log(`[Queue] All files ready!`);
+                updateEncryptButton();
+            }
         }
 
         // Update File Queue UI
@@ -1989,6 +2011,7 @@
         // Get Status Icon
         function getStatusIcon(status) {
             switch (status) {
+                case 'loading': return '📖';  // Reading file content
                 case 'pending': return '⏳';
                 case 'encrypting': return '🔄';
                 case 'done': return '✅';
@@ -2046,10 +2069,15 @@
         function updateEncryptButton() {
             const btn = document.getElementById('encryptBtn');
             const pendingFiles = filesToEncrypt.filter(f => f.status === 'pending').length;
-            btn.disabled = pendingFiles === 0;
+            const loadingFiles = filesToEncrypt.filter(f => f.status === 'loading').length;
+            
+            // Disable if no pending files OR if any files are still loading
+            btn.disabled = pendingFiles === 0 || loadingFiles > 0;
             
             if (currentMode === 'decrypt') {
-                if (pendingFiles === 0) {
+                if (loadingFiles > 0) {
+                    btn.textContent = `📖 Loading ${loadingFiles} file${loadingFiles > 1 ? 's' : ''}...`;
+                } else if (pendingFiles === 0) {
                     btn.textContent = '🔓 Decrypt Files';
                 } else if (pendingFiles === 1) {
                     btn.textContent = '🔓 Decrypt 1 File';
