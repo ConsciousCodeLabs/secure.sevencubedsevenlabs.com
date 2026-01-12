@@ -1179,6 +1179,10 @@
             color: var(--warning);
         }
 
+        body.decrypt-mode .card-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+        }
+
         body.decrypt-mode .preset-buttons {
             display: none;
         }
@@ -1315,9 +1319,9 @@
             <div class="main-card-inner">
                 <!-- Card Header -->
                 <div class="card-header">
-                    <h2>🔐 Secure File Encryption</h2>
-                    <p>4-Shell Recursive Encryption • 2,401 Unique Pathways</p>
-                    <p class="fun-fact">Fun fact: 7³ × 7 = 2,401 = Complete Protection (unlike 666... that's missing a shell 😏)</p>
+                    <h2 id="mainHeaderTitle">🔐 Secure File Encryption</h2>
+                    <p id="mainHeaderSubtitle">4-Shell Recursive Encryption • 2,401 Unique Pathways</p>
+                    <p class="fun-fact" id="mainHeaderFunFact">Fun fact: 7³ × 7 = 2,401 = Complete Protection (unlike 666... that's missing a shell 😏)</p>
                 </div>
 
                 <!-- Mode Toggle (Encrypt/Decrypt) -->
@@ -1638,6 +1642,21 @@
                 dropZoneText.textContent = 'Drag & drop files here';
                 dropZoneHint.innerHTML = `or click to browse • Max <span id="maxFileSizeDisplay">${getMaxFileSizeMB()}MB</span> per file<br><span class="batch-hint">✨ Multiple files supported!</span>`;
                 dropZoneJoke.textContent = 'Your files enter 4 shells. Hackers enter despair. 🐚🐚🐚🐚';
+            }
+            
+            // Update main header based on mode
+            const headerTitle = document.getElementById('mainHeaderTitle');
+            const headerSubtitle = document.getElementById('mainHeaderSubtitle');
+            const headerFunFact = document.getElementById('mainHeaderFunFact');
+            
+            if (mode === 'decrypt') {
+                headerTitle.textContent = '🔓 Secure File Decryption';
+                headerSubtitle.textContent = '4-Shell Recursive Decryption • 2,401 Unique Pathways';
+                headerFunFact.textContent = 'Unwrap your treasures! Each file exits 4 shells of protection 🎁';
+            } else {
+                headerTitle.textContent = '🔐 Secure File Encryption';
+                headerSubtitle.textContent = '4-Shell Recursive Encryption • 2,401 Unique Pathways';
+                headerFunFact.textContent = 'Fun fact: 7³ × 7 = 2,401 = Complete Protection (unlike 666... that\'s missing a shell 😏)';
             }
             
             // Update file queue title
