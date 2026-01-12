@@ -728,6 +728,23 @@
             cursor: not-allowed;
         }
 
+        .btn-retry {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            animation: pulse-retry 2s infinite;
+        }
+
+        .btn-retry:hover, .btn-retry:active {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            transform: translateY(-1px);
+        }
+
+        @keyframes pulse-retry {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+        }
+
         /* Progress Section */
         .batch-progress {
             background: var(--dark-lighter);
@@ -1498,6 +1515,9 @@
                     <button class="btn btn-encrypt" id="encryptBtn" onclick="encryptAllFiles()" disabled aria-label="Encrypt all files">
                         🔒 Encrypt Files
                     </button>
+                    <button class="btn btn-retry" id="retryBtn" onclick="retryFailed()" style="display: none;" aria-label="Retry failed files">
+                        🔄 Retry Failed
+                    </button>
                     <button class="btn btn-download" id="downloadBtn" onclick="downloadAllAsZip()" disabled aria-label="Download encrypted files as ZIP">
                         📦 Download ZIP
                     </button>
@@ -1973,9 +1993,44 @@
                 }
             }
             
+            // Show/hide Retry Failed button
+            const retryBtn = document.getElementById('retryBtn');
+            const errorFiles = filesToEncrypt.filter(f => f.status === 'error').length;
+            if (errorFiles > 0) {
+                retryBtn.style.display = 'flex';
+                retryBtn.textContent = errorFiles === 1 
+                    ? '🔄 Retry 1 Failed' 
+                    : `🔄 Retry ${errorFiles} Failed`;
+            } else {
+                retryBtn.style.display = 'none';
+            }
+            
             // Also update key files match status
             if (currentMode === 'decrypt') {
                 updateKeyFilesList();
+            }
+        }
+
+        // Retry Failed Files - Reset error status to pending
+        function retryFailed() {
+            let resetCount = 0;
+            filesToEncrypt.forEach(item => {
+                if (item.status === 'error') {
+                    item.status = 'pending';
+                    item.progress = 0;
+                    resetCount++;
+                }
+            });
+            
+            if (resetCount > 0) {
+                updateFileQueue();
+                updateEncryptButton();
+                
+                // Hide results section to show we're ready for retry
+                document.getElementById('resultsSection').classList.remove('active');
+                
+                // Scroll to pathway selector as a hint to check it
+                document.querySelector('.pathway-selector').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
