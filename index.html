@@ -429,6 +429,12 @@
             font-weight: 600;
         }
 
+        .drop-zone-hint .no-limit-hint {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
         .drop-zone-joke {
             font-size: 0.75rem;
             color: var(--gold);
@@ -1625,7 +1631,7 @@
             if (mode === 'decrypt') {
                 dropZoneIcon.textContent = '🔐';
                 dropZoneText.textContent = 'Drag & drop encrypted files here';
-                dropZoneHint.innerHTML = `or click to browse • .encrypted files<br><span class="batch-hint">✨ Batch decryption supported!</span>`;
+                dropZoneHint.innerHTML = `or click to browse • .encrypted files<br><span class="batch-hint">✨ Batch decryption supported!</span><br><span class="no-limit-hint">🎉 No file size limits - decrypt any file!</span>`;
                 dropZoneJoke.textContent = 'Time to unwrap your protected treasures! 🎁';
             } else {
                 dropZoneIcon.textContent = '📁';
