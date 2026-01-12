@@ -1533,8 +1533,8 @@
             setupKeyFileInput();
             if (currentApiKey) {
                 document.getElementById('apiKeyInput').value = currentApiKey;
-                // ✅ FIX: Show validating state before API call
-                document.getElementById('keyStatus').textContent = '⏳ Validating saved key...';
+                // FIX: Show validating state before API call
+                document.getElementById('keyStatus').textContent = '⏳ Validating key...';
                 document.getElementById('keyStatus').className = 'key-status';
                 validateApiKey(currentApiKey);
             }
@@ -2364,7 +2364,7 @@ To decrypt ANY file, you need ALL THREE:
                 clearApiKey();
                 return;
             }
-            // ✅ FIX: Show validating state before API call
+            // FIX: Show validating state before API call
             document.getElementById('keyStatus').textContent = '⏳ Validating key...';
             document.getElementById('keyStatus').className = 'key-status';
             await validateApiKey(key);
@@ -2388,7 +2388,7 @@ To decrypt ANY file, you need ALL THREE:
                     document.getElementById('keyStatus').textContent = `✅ API key applied - ${result.tier.charAt(0).toUpperCase() + result.tier.slice(1)} Plan active`;
                     document.getElementById('keyStatus').className = 'key-status valid';
                 } else {
-                    // ✅ FIX: Reset to free tier on invalid key
+                    // FIX: Reset to free tier on invalid key
                     currentApiKey = '';
                     currentTier = 'free';
                     localStorage.removeItem(STORAGE_KEY);
@@ -2397,7 +2397,7 @@ To decrypt ANY file, you need ALL THREE:
                     document.getElementById('keyStatus').className = 'key-status invalid';
                 }
             } catch (error) {
-                // ✅ FIX: Reset to free tier on network error
+                // FIX: Reset to free tier on network error
                 currentApiKey = '';
                 currentTier = 'free';
                 localStorage.removeItem(STORAGE_KEY);
