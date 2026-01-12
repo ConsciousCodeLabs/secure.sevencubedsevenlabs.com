@@ -429,12 +429,6 @@
             font-weight: 600;
         }
 
-        .drop-zone-hint .no-limit-hint {
-            color: var(--gold);
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
         .drop-zone-joke {
             font-size: 0.75rem;
             color: var(--gold);
@@ -470,6 +464,30 @@
             padding: 0.2rem 0.6rem;
             border-radius: 20px;
             font-size: 0.8rem;
+        }
+
+        .file-queue-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-retry-failed {
+            background: var(--warning);
+            border: none;
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            font-weight: 600;
+        }
+
+        .btn-retry-failed:hover, .btn-retry-failed:active {
+            background: #e6a817;
+            transform: scale(1.02);
         }
 
         .btn-clear-all {
@@ -543,10 +561,19 @@
             font-size: 1rem;
         }
 
+        .status-icon.loading { 
+            color: var(--primary); 
+            animation: pulse 1s ease-in-out infinite;
+        }
         .status-icon.pending { color: var(--gray); }
         .status-icon.encrypting { color: var(--warning); }
         .status-icon.done { color: var(--accent); }
         .status-icon.error { color: var(--error); }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
 
         .file-progress {
             width: 60px;
@@ -734,23 +761,6 @@
             cursor: not-allowed;
         }
 
-        .btn-retry {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            border: none;
-            animation: pulse-retry 2s infinite;
-        }
-
-        .btn-retry:hover, .btn-retry:active {
-            background: linear-gradient(135deg, #d97706, #b45309);
-            transform: translateY(-1px);
-        }
-
-        @keyframes pulse-retry {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
-        }
-
         /* Progress Section */
         .batch-progress {
             background: var(--dark-lighter);
@@ -865,7 +875,7 @@
         }
 
         .btn-start-fresh {
-            background: var(--dark-lighter);
+            background: var(--surface);
             color: var(--gray);
             padding: 0.65rem 1.1rem;
             border-radius: 6px;
@@ -882,7 +892,7 @@
 
         .btn-start-fresh:hover, .btn-start-fresh:active {
             background: var(--dark);
-            color: var(--white);
+            color: var(--text);
             border-color: var(--primary);
         }
 
@@ -1093,6 +1103,11 @@
             color: var(--accent);
         }
 
+        .key-file-item .match-status.waiting {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
         .key-file-item .match-status.unmatched {
             background: rgba(239, 68, 68, 0.2);
             color: var(--error);
@@ -1177,10 +1192,6 @@
 
         body.decrypt-mode .results-title {
             color: var(--warning);
-        }
-
-        body.decrypt-mode .card-header {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
         }
 
         body.decrypt-mode .preset-buttons {
@@ -1319,9 +1330,9 @@
             <div class="main-card-inner">
                 <!-- Card Header -->
                 <div class="card-header">
-                    <h2 id="mainHeaderTitle">🔐 Secure File Encryption</h2>
-                    <p id="mainHeaderSubtitle">4-Shell Recursive Encryption • 2,401 Unique Pathways</p>
-                    <p class="fun-fact" id="mainHeaderFunFact">Fun fact: 7³ × 7 = 2,401 = Complete Protection (unlike 666... that's missing a shell 😏)</p>
+                    <h2>🔐 Secure File Encryption</h2>
+                    <p>4-Shell Recursive Encryption • 2,401 Unique Pathways</p>
+                    <p class="fun-fact">Fun fact: 7³ × 7 = 2,401 = Complete Protection (unlike 666... that's missing a shell 😏)</p>
                 </div>
 
                 <!-- Mode Toggle (Encrypt/Decrypt) -->
@@ -1420,7 +1431,10 @@
                             📋 Files to Encrypt
                             <span class="file-count" id="fileCount" aria-label="Number of files">0</span>
                         </div>
-                        <button class="btn-clear-all" onclick="clearAllFiles()" aria-label="Clear all files">Clear All</button>
+                        <div class="file-queue-actions">
+                            <button class="btn-retry-failed" id="retryFailedBtn" onclick="resetErrors()" style="display: none;" aria-label="Retry failed files">🔄 Retry Failed</button>
+                            <button class="btn-clear-all" onclick="clearAllFiles()" aria-label="Clear all files">Clear All</button>
+                        </div>
                     </div>
                     <div class="file-list" id="fileList" role="list"></div>
                 </section>
@@ -1509,7 +1523,7 @@
                             <button class="btn-download-all" onclick="downloadAllAsZip()" aria-label="Download all files as ZIP">
                                 📦 Download All (ZIP)
                             </button>
-                            <button class="btn-start-fresh" onclick="startFresh()" aria-label="Start fresh">
+                            <button class="btn-start-fresh" onclick="startFresh()" aria-label="Clear form and start fresh">
                                 🔄 Start Fresh
                             </button>
                         </div>
@@ -1524,9 +1538,6 @@
                 <div class="action-buttons">
                     <button class="btn btn-encrypt" id="encryptBtn" onclick="encryptAllFiles()" disabled aria-label="Encrypt all files">
                         🔒 Encrypt Files
-                    </button>
-                    <button class="btn btn-retry" id="retryBtn" onclick="retryFailed()" style="display: none;" aria-label="Retry failed files">
-                        🔄 Retry Failed
                     </button>
                     <button class="btn btn-download" id="downloadBtn" onclick="downloadAllAsZip()" disabled aria-label="Download encrypted files as ZIP">
                         📦 Download ZIP
@@ -1596,9 +1607,6 @@
             setupKeyFileInput();
             if (currentApiKey) {
                 document.getElementById('apiKeyInput').value = currentApiKey;
-                // FIX: Show validating state before API call
-                document.getElementById('keyStatus').textContent = '⏳ Validating key...';
-                document.getElementById('keyStatus').className = 'key-status';
                 validateApiKey(currentApiKey);
             }
             updatePathwayDisplay();
@@ -1635,28 +1643,13 @@
             if (mode === 'decrypt') {
                 dropZoneIcon.textContent = '🔐';
                 dropZoneText.textContent = 'Drag & drop encrypted files here';
-                dropZoneHint.innerHTML = `or click to browse • .encrypted files<br><span class="batch-hint">✨ Batch decryption supported!</span><br><span class="no-limit-hint">🎉 No file size limits - decrypt any file!</span>`;
+                dropZoneHint.innerHTML = `or click to browse • .encrypted files<br><span class="batch-hint">✨ Batch decryption supported!</span>`;
                 dropZoneJoke.textContent = 'Time to unwrap your protected treasures! 🎁';
             } else {
                 dropZoneIcon.textContent = '📁';
                 dropZoneText.textContent = 'Drag & drop files here';
                 dropZoneHint.innerHTML = `or click to browse • Max <span id="maxFileSizeDisplay">${getMaxFileSizeMB()}MB</span> per file<br><span class="batch-hint">✨ Multiple files supported!</span>`;
                 dropZoneJoke.textContent = 'Your files enter 4 shells. Hackers enter despair. 🐚🐚🐚🐚';
-            }
-            
-            // Update main header based on mode
-            const headerTitle = document.getElementById('mainHeaderTitle');
-            const headerSubtitle = document.getElementById('mainHeaderSubtitle');
-            const headerFunFact = document.getElementById('mainHeaderFunFact');
-            
-            if (mode === 'decrypt') {
-                headerTitle.textContent = '🔓 Secure File Decryption';
-                headerSubtitle.textContent = '4-Shell Recursive Decryption • 2,401 Unique Pathways';
-                headerFunFact.textContent = 'Unwrap your treasures! Each file exits 4 shells of protection 🎁';
-            } else {
-                headerTitle.textContent = '🔐 Secure File Encryption';
-                headerSubtitle.textContent = '4-Shell Recursive Encryption • 2,401 Unique Pathways';
-                headerFunFact.textContent = 'Fun fact: 7³ × 7 = 2,401 = Complete Protection (unlike 666... that\'s missing a shell 😏)';
             }
             
             // Update file queue title
@@ -1735,11 +1728,36 @@
             // CRITICAL: Convert FileList to Array to prevent issues with click-to-browse
             const fileArray = Array.from(files);
             
-            // Process all files
-            const promises = fileArray.map(async (file) => {
+            // Filter and validate .key files
+            const validFiles = [];
+            const rejectedFiles = [];
+            
+            for (const file of fileArray) {
+                if (!file.name.toLowerCase().endsWith('.key')) {
+                    rejectedFiles.push(file.name);
+                } else {
+                    validFiles.push(file);
+                }
+            }
+            
+            // Alert user about rejected files
+            if (rejectedFiles.length > 0) {
+                alert(`⚠️ Invalid key file(s) rejected:\n\n${rejectedFiles.join('\n')}\n\nKey files must end with .key extension`);
+            }
+            
+            if (validFiles.length === 0) return;
+            
+            // Process valid files
+            const promises = validFiles.map(async (file) => {
                 // Read key content
                 const keyContent = await file.text();
                 const trimmedKey = keyContent.trim();
+                
+                // Validate key format (64 hex characters)
+                if (!/^[0-9a-fA-F]{64}$/.test(trimmedKey)) {
+                    console.warn(`[Keys] Invalid key format in ${file.name}: ${trimmedKey.length} chars`);
+                    return { error: true, name: file.name, reason: 'not 64 hex characters' };
+                }
                 
                 // Extract base filename (remove .key extension)
                 let baseName = file.name;
@@ -1762,9 +1780,15 @@
             // Wait for all files to be processed
             const results = await Promise.all(promises);
             
-            // Add non-null results to keyFiles
+            // Check for invalid key format errors
+            const invalidKeys = results.filter(r => r && r.error);
+            if (invalidKeys.length > 0) {
+                alert(`⚠️ Invalid key content:\n\n${invalidKeys.map(k => `${k.name}: ${k.reason}`).join('\n')}\n\nKeys must be exactly 64 hex characters.`);
+            }
+            
+            // Add non-null, non-error results to keyFiles
             results.forEach(result => {
-                if (result) {
+                if (result && !result.error) {
                     keyFiles.push(result);
                 }
             });
@@ -1783,6 +1807,9 @@
             
             listEl.style.display = 'block';
             
+            // Check if there are ANY encrypted files in the queue
+            const hasAnyEncryptedFiles = filesToEncrypt.length > 0;
+            
             listEl.innerHTML = keyFiles.map((keyFile, index) => {
                 // Check if there's a matching encrypted file
                 const hasMatch = filesToEncrypt.some(f => {
@@ -1790,12 +1817,27 @@
                     return encryptedBase === keyFile.name;
                 });
                 
+                // Determine status: matched, waiting (no files yet), or no match
+                let statusClass, statusText;
+                if (hasMatch) {
+                    statusClass = 'matched';
+                    statusText = '✓ matched';
+                } else if (!hasAnyEncryptedFiles) {
+                    // No files uploaded yet - key is ready and waiting
+                    statusClass = 'waiting';
+                    statusText = '⏳ ready';
+                } else {
+                    // Files exist but none match this key
+                    statusClass = 'unmatched';
+                    statusText = '⚠ no match';
+                }
+                
                 return `
                     <div class="key-file-item">
                         <span>🔑</span>
                         <span>${escapeHtml(keyFile.fileName)}</span>
-                        <span class="match-status ${hasMatch ? 'matched' : 'unmatched'}">
-                            ${hasMatch ? '✓ matched' : '⚠ no match'}
+                        <span class="match-status ${statusClass}">
+                            ${statusText}
                         </span>
                         <button class="file-remove" onclick="removeKeyFile(${index})" aria-label="Remove key">×</button>
                     </div>
@@ -1876,11 +1918,25 @@
         }
 
         // Handle Files
-        function handleFiles(files) {
+        async function handleFiles(files) {
             const maxSize = getMaxFileSize();
             const maxSizeMB = getMaxFileSizeMB();
             
+            // Clear completed/errored files when adding new ones (fresh start)
+            const previouslyDone = filesToEncrypt.filter(f => f.status === 'done' || f.status === 'error').length;
+            if (previouslyDone > 0) {
+                console.log(`[Queue] Clearing ${previouslyDone} completed/errored files before adding new ones`);
+                filesToEncrypt = filesToEncrypt.filter(f => f.status !== 'done' && f.status !== 'error');
+                encryptedResults = [];  // Also clear results
+                document.getElementById('resultsSection').classList.remove('active');
+            }
+            
+            // In decrypt mode, validate .encrypted extension
+            const rejectedFiles = [];
+            const validFiles = [];
+            
             for (const file of files) {
+                // Check file size first
                 if (file.size > maxSize) {
                     if (currentTier === 'free') {
                         alert(`📁 File "${file.name}" exceeds ${maxSizeMB}MB limit.\n\n🚀 Upgrade to Starter for 50MB\n👑 Or Enterprise for 100MB files!\n\nThe ARK has room, but you need a bigger ticket!`);
@@ -1892,23 +1948,67 @@
                     continue;
                 }
 
+                // In decrypt mode, require .encrypted extension
+                if (currentMode === 'decrypt' && !file.name.toLowerCase().endsWith('.encrypted')) {
+                    rejectedFiles.push(file.name);
+                    continue;
+                }
+
                 // Check if file already in queue
                 if (filesToEncrypt.some(f => f.name === file.name && f.size === file.size)) {
                     continue;
                 }
+                
+                validFiles.push(file);
+            }
+            
+            // Alert about rejected files in decrypt mode
+            if (rejectedFiles.length > 0) {
+                alert(`⚠️ Invalid file(s) rejected:\n\n${rejectedFiles.join('\n')}\n\nIn Decrypt mode, files must end with .encrypted extension.\n\n💡 Tip: Encrypted files are created with .encrypted extension when you encrypt.`);
+            }
 
-                filesToEncrypt.push({
+            // STEP 1: Add all files to queue with 'loading' status IMMEDIATELY
+            const newItems = [];
+            for (const file of validFiles) {
+                const item = {
                     file: file,
                     name: file.name,
                     size: file.size,
-                    status: 'pending',
+                    status: currentMode === 'decrypt' ? 'loading' : 'pending',  // Loading for decrypt
                     progress: 0,
-                    result: null
-                });
+                    result: null,
+                    content: null  // Will be filled async for decrypt
+                };
+                filesToEncrypt.push(item);
+                newItems.push(item);
             }
-
+            
+            // Update UI immediately to show files are in queue (with loading status)
             updateFileQueue();
             updateEncryptButton();
+
+            // STEP 2: Read content asynchronously for decrypt mode
+            if (currentMode === 'decrypt' && newItems.length > 0) {
+                console.log(`[Queue] Reading content for ${newItems.length} files...`);
+                
+                // Read all files in parallel
+                await Promise.all(newItems.map(async (item) => {
+                    try {
+                        console.log(`[Queue] Reading: ${item.name}`);
+                        item.content = await item.file.text();
+                        console.log(`[Queue] Read ${item.content.length} chars from ${item.name}`);
+                        item.status = 'pending';  // Ready for decrypt
+                    } catch (err) {
+                        console.error(`[Queue] Failed to read ${item.name}:`, err);
+                        item.status = 'error';
+                        item.content = null;
+                    }
+                    updateFileQueue();  // Update UI as each file completes
+                }));
+                
+                console.log(`[Queue] All files ready!`);
+                updateEncryptButton();
+            }
         }
 
         // Update File Queue UI
@@ -1916,6 +2016,7 @@
             const queueEl = document.getElementById('fileQueue');
             const listEl = document.getElementById('fileList');
             const countEl = document.getElementById('fileCount');
+            const retryBtn = document.getElementById('retryFailedBtn');
 
             if (filesToEncrypt.length === 0) {
                 queueEl.style.display = 'none';
@@ -1924,6 +2025,12 @@
 
             queueEl.style.display = 'block';
             countEl.textContent = filesToEncrypt.length;
+            
+            // Show/hide retry button based on whether there are errors
+            const hasErrors = filesToEncrypt.some(f => f.status === 'error');
+            if (retryBtn) {
+                retryBtn.style.display = hasErrors ? 'inline-block' : 'none';
+            }
 
             listEl.innerHTML = filesToEncrypt.map((item, index) => `
                 <div class="file-item" id="file-${index}" role="listitem">
@@ -1946,6 +2053,7 @@
         // Get Status Icon
         function getStatusIcon(status) {
             switch (status) {
+                case 'loading': return '📖';  // Reading file content
                 case 'pending': return '⏳';
                 case 'encrypting': return '🔄';
                 case 'done': return '✅';
@@ -1972,13 +2080,15 @@
             document.getElementById('downloadBtn').disabled = true;
         }
 
-        // Start Fresh - Reset everything for next batch
+        // Start Fresh - clear everything and reset form
         function startFresh() {
-            // Clear files and results
+            console.log('[Fresh] Starting fresh - clearing all state');
+            
+            // Clear files
             filesToEncrypt = [];
             encryptedResults = [];
             
-            // Clear keys (decrypt mode)
+            // Clear keys
             keyFiles = [];
             document.getElementById('manualKeyInput').value = '';
             updateKeyFilesList();
@@ -1990,18 +2100,58 @@
             document.getElementById('batchProgress').classList.remove('active');
             document.getElementById('downloadBtn').disabled = true;
             
-            // Scroll back to drop zone
-            document.querySelector('.drop-zone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Reset pathway to default [1,1,1,1]
+            document.querySelectorAll('.pathway-input').forEach(input => {
+                input.value = '1';
+            });
+            document.getElementById('pathwayDisplay').textContent = '[1, 1, 1, 1]';
+            
+            // Scroll to top of main content
+            document.querySelector('.drop-zone').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            console.log('[Fresh] Form cleared - ready for new files!');
+        }
+
+        // Reset Error Status - allows retry without clearing files
+        async function resetErrors() {
+            let errorsReset = 0;
+            for (const item of filesToEncrypt) {
+                if (item.status === 'error') {
+                    // If content is missing (shouldn't happen, but defensive), try to re-read
+                    if (currentMode === 'decrypt' && !item.content && item.file) {
+                        try {
+                            console.log(`[Reset] Re-reading content for ${item.name}`);
+                            item.content = await item.file.text();
+                        } catch (e) {
+                            console.warn(`[Reset] Could not re-read ${item.name}, will try with File object`);
+                        }
+                    }
+                    item.status = 'pending';
+                    item.progress = 0;
+                    errorsReset++;
+                }
+            }
+            if (errorsReset > 0) {
+                console.log(`[Reset] Reset ${errorsReset} files from error to pending`);
+                updateFileQueue();
+                updateEncryptButton();
+            }
+            return errorsReset;
         }
 
         // Update Encrypt Button State
         function updateEncryptButton() {
             const btn = document.getElementById('encryptBtn');
             const pendingFiles = filesToEncrypt.filter(f => f.status === 'pending').length;
-            btn.disabled = pendingFiles === 0;
+            const loadingFiles = filesToEncrypt.filter(f => f.status === 'loading').length;
+            
+            // Disable if no pending files OR if any files are still loading
+            btn.disabled = pendingFiles === 0 || loadingFiles > 0;
             
             if (currentMode === 'decrypt') {
-                if (pendingFiles === 0) {
+                if (loadingFiles > 0) {
+                    btn.textContent = `📖 Loading ${loadingFiles} file${loadingFiles > 1 ? 's' : ''}...`;
+                } else if (pendingFiles === 0) {
                     btn.textContent = '🔓 Decrypt Files';
                 } else if (pendingFiles === 1) {
                     btn.textContent = '🔓 Decrypt 1 File';
@@ -2018,44 +2168,9 @@
                 }
             }
             
-            // Show/hide Retry Failed button
-            const retryBtn = document.getElementById('retryBtn');
-            const errorFiles = filesToEncrypt.filter(f => f.status === 'error').length;
-            if (errorFiles > 0) {
-                retryBtn.style.display = 'flex';
-                retryBtn.textContent = errorFiles === 1 
-                    ? '🔄 Retry 1 Failed' 
-                    : `🔄 Retry ${errorFiles} Failed`;
-            } else {
-                retryBtn.style.display = 'none';
-            }
-            
             // Also update key files match status
             if (currentMode === 'decrypt') {
                 updateKeyFilesList();
-            }
-        }
-
-        // Retry Failed Files - Reset error status to pending
-        function retryFailed() {
-            let resetCount = 0;
-            filesToEncrypt.forEach(item => {
-                if (item.status === 'error') {
-                    item.status = 'pending';
-                    item.progress = 0;
-                    resetCount++;
-                }
-            });
-            
-            if (resetCount > 0) {
-                updateFileQueue();
-                updateEncryptButton();
-                
-                // Hide results section to show we're ready for retry
-                document.getElementById('resultsSection').classList.remove('active');
-                
-                // Scroll to pathway selector as a hint to check it
-                document.querySelector('.pathway-selector').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
@@ -2112,16 +2227,7 @@
                     item.status = 'error';
                     item.progress = 0;
                     console.error(`Error encrypting ${item.name}:`, error);
-                    
-                    // Helpful error message
-                    const errorMsg = error.message || 'Unknown error';
-                    alert(`❌ Encryption failed for ${item.name}\n\n` +
-                          `Error: ${errorMsg}\n\n` +
-                          `Please verify:\n` +
-                          `• File size is within your tier limit\n` +
-                          `• Network connection is stable\n` +
-                          `• API key is valid (if using paid tier)\n\n` +
-                          `Tip: Click "Retry Failed" to try again.`);
+                    alert(`Error encrypting ${item.name}: ${error.message}`);
                 }
 
                 updateFileQueue();
@@ -2139,8 +2245,6 @@
                     document.getElementById('resultsSummary').textContent = 
                         `${encryptedResults.length} file${encryptedResults.length > 1 ? 's' : ''} encrypted with pathway [${pathway.join(', ')}] • Protected by 4 shells 🐚🐚🐚🐚`;
                     document.getElementById('downloadBtn').disabled = false;
-                    // Scroll to results
-                    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 500);
 
@@ -2204,7 +2308,25 @@
                         throw new Error('No decryption key found for this file');
                     }
                     
-                    const result = await decryptFile(item.file, pathway, key);
+                    // Ensure we have content - re-read if necessary
+                    let contentToDecrypt = item.content;
+                    if (!contentToDecrypt || contentToDecrypt.length === 0) {
+                        console.log(`[Decrypt] Content missing for ${item.name}, re-reading...`);
+                        if (item.file) {
+                            try {
+                                contentToDecrypt = await item.file.text();
+                                item.content = contentToDecrypt;  // Cache it
+                                console.log(`[Decrypt] Re-read ${contentToDecrypt.length} chars`);
+                            } catch (readErr) {
+                                console.error(`[Decrypt] Failed to re-read file:`, readErr);
+                                throw new Error('File content unavailable - please re-upload the file');
+                            }
+                        } else {
+                            throw new Error('File content unavailable - please re-upload the file');
+                        }
+                    }
+                    
+                    const result = await decryptFile(contentToDecrypt, pathway, key, item.name);
                     item.status = 'done';
                     item.progress = 100;
                     item.result = result;
@@ -2225,17 +2347,8 @@
                     item.status = 'error';
                     item.progress = 0;
                     console.error(`Error decrypting ${item.name}:`, error);
-                    
-                    // Helpful error message with troubleshooting tips
-                    const errorMsg = error.message || 'Unknown error';
-                    const pathway = getPathway();
-                    alert(`❌ Decryption failed for ${item.name}\n\n` +
-                          `Error: ${errorMsg}\n\n` +
-                          `Please verify:\n` +
-                          `• Pathway [${pathway.join(', ')}] matches the original encryption\n` +
-                          `• Correct .key file is loaded for this specific file\n` +
-                          `• File was encrypted with Patent #65\n\n` +
-                          `Tip: Try adjusting the pathway and click "Retry Failed" to try again.`);
+                    // Show error but don't block - allow other files to continue
+                    alert(`Error decrypting ${item.name}: ${error.message}\n\nYou can retry by clicking "Decrypt Files" again after errors are cleared.`);
                 }
 
                 updateFileQueue();
@@ -2255,79 +2368,230 @@
                         `${encryptedResults.length} file${encryptedResults.length > 1 ? 's' : ''} decrypted with pathway [${pathway.join(', ')}] • Unwrapped from 4 shells 🎁`;
                     document.querySelector('.results-joke').textContent = 'Your files have been safely unwrapped from their 4-shell cocoon! 🦋';
                     document.getElementById('downloadBtn').disabled = false;
-                    // Scroll to results
-                    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 500);
 
             updateEncryptButton();
         }
 
-        // Decrypt Single File
-        async function decryptFile(file, pathway, key) {
-            // Read file content (should be hex ciphertext)
-            const ciphertext = await file.text();
-
-            const response = await fetch(`${API_BASE}/decrypt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(currentApiKey && { 'X-API-Key': currentApiKey })
-                },
-                body: JSON.stringify({
-                    ciphertext: ciphertext.trim(),
-                    key: key,
+        // Decrypt Single File (with retry for network errors)
+        async function decryptFile(fileOrContent, pathway, key, fileName = 'unknown', retryCount = 0) {
+            const MAX_RETRIES = 3;
+            
+            try {
+                // Get ciphertext - either from stored content (string) or read from File object
+                let ciphertext;
+                if (typeof fileOrContent === 'string') {
+                    // Content was pre-read and stored
+                    console.log(`[Decrypt] Using stored content for: ${fileName}`);
+                    ciphertext = fileOrContent;
+                } else {
+                    // Read from File object (fallback)
+                    console.log(`[Decrypt] Reading file: ${fileOrContent.name} (${fileOrContent.size} bytes)`);
+                    ciphertext = await fileOrContent.text();
+                }
+                
+                // Validate we have content
+                if (!ciphertext || ciphertext.length === 0) {
+                    throw new Error('No content to decrypt - file may be empty');
+                }
+                
+                // Clean the ciphertext - remove any whitespace, newlines, BOM
+                const cleanCiphertext = ciphertext.trim().replace(/[\r\n\s]/g, '');
+                console.log(`[Decrypt] Ciphertext length: ${cleanCiphertext.length} chars`);
+                
+                // Validate hex format
+                if (!/^[0-9a-fA-F]+$/.test(cleanCiphertext)) {
+                    throw new Error('Invalid encrypted file format - not valid hex data');
+                }
+                
+                // Validate and clean key format
+                const cleanKey = key.trim();
+                if (!/^[0-9a-fA-F]{64}$/.test(cleanKey)) {
+                    throw new Error(`Invalid key format - must be 64 hex characters (got ${cleanKey.length})`);
+                }
+                
+                console.log(`[Decrypt] Sending to API with pathway: [${pathway.join(', ')}] (attempt ${retryCount + 1})`);
+                
+                const requestBody = JSON.stringify({
+                    ciphertext: cleanCiphertext,
+                    key: cleanKey,
                     pathway: pathway
-                })
-            });
+                });
+                
+                console.log(`[Decrypt] Request body size: ${requestBody.length} bytes`);
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Decryption failed');
+                // Add cache-busting timestamp to prevent stale connections
+                const url = `${API_BASE}/decrypt?_t=${Date.now()}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store',
+                        ...(currentApiKey && { 'X-API-Key': currentApiKey })
+                    },
+                    body: requestBody,
+                    cache: 'no-store'  // Prevent browser caching
+                });
+
+                console.log(`[Decrypt] Response status: ${response.status}`);
+
+                if (!response.ok) {
+                    let errorMessage = 'Decryption failed';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.detail || error.message || errorMessage;
+                        
+                        // Improve error messages for common issues
+                        if (errorMessage.includes('verification failed') || errorMessage.includes('Decryption failed')) {
+                            errorMessage = `Decryption failed: ${errorMessage}. Verify ciphertext, key, and pathway ALL match the original encryption.`;
+                        }
+                    } catch (e) {
+                        // If we can't parse JSON, create a helpful error based on status
+                        if (response.status === 400) {
+                            errorMessage = 'Bad request - check your file format and key';
+                        } else if (response.status === 422) {
+                            errorMessage = 'Invalid data - the file may be corrupted or the key is wrong';
+                        } else if (response.status === 500) {
+                            errorMessage = 'Server error - the pathway/key combination may be incorrect';
+                        } else {
+                            errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        }
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log(`[Decrypt] Success! Decryption time: ${result.decryption_time_ms}ms`);
+                
+                // Note: Decrypt is FREE - no usage tracking
+                
+                return result;
+            } catch (error) {
+                console.error(`[Decrypt] Error (attempt ${retryCount + 1}):`, error);
+                
+                const errorMsg = error.message || '';
+                
+                // Check if this is a retryable network error
+                const isNetworkError = errorMsg === 'Load failed' || 
+                                       errorMsg === 'Failed to fetch' ||
+                                       errorMsg.includes('NetworkError') ||
+                                       errorMsg.includes('network');
+                
+                // Retry on network errors (up to MAX_RETRIES times)
+                if (isNetworkError && retryCount < MAX_RETRIES) {
+                    console.log(`[Decrypt] Network error, retrying in 500ms... (${retryCount + 1}/${MAX_RETRIES})`);
+                    await new Promise(resolve => setTimeout(resolve, 500));  // Wait 500ms before retry
+                    return decryptFile(fileOrContent, pathway, key, fileName, retryCount + 1);
+                }
+                
+                // Categorize and improve error messages
+                if (isNetworkError) {
+                    throw new Error('Network error - please check your connection and try again');
+                } else if (errorMsg.includes('verification failed') || errorMsg.includes('Decryption failed')) {
+                    throw new Error(errorMsg);
+                } else if (errorMsg.includes('Invalid')) {
+                    throw new Error(errorMsg);
+                } else {
+                    throw error;
+                }
             }
-
-            const result = await response.json();
-            
-            // Note: Decrypt is FREE - no usage tracking
-            
-            return result;
         }
 
-        // Encrypt Single File
-        async function encryptFile(file, pathway) {
-            // Read file as base64
-            const base64 = await fileToBase64(file);
+        // Encrypt Single File (with retry for network errors)
+        async function encryptFile(file, pathway, retryCount = 0) {
+            const MAX_RETRIES = 3;
+            
+            try {
+                // Read file as base64
+                const base64 = await fileToBase64(file);
+                
+                if (!base64 || base64.length === 0) {
+                    throw new Error('Failed to read file content');
+                }
+                
+                console.log(`[Encrypt] Sending ${file.name} (${base64.length} chars base64) with pathway [${pathway.join(', ')}] (attempt ${retryCount + 1})`);
 
-            const response = await fetch(`${API_BASE}/encrypt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(currentApiKey && { 'X-API-Key': currentApiKey })
-                },
-                body: JSON.stringify({
-                    plaintext: base64,
-                    pathway: pathway
-                })
-            });
+                // Add cache-busting timestamp to prevent stale connections
+                const url = `${API_BASE}/encrypt?_t=${Date.now()}`;
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Encryption failed');
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store',
+                        ...(currentApiKey && { 'X-API-Key': currentApiKey })
+                    },
+                    body: JSON.stringify({
+                        plaintext: base64,
+                        pathway: pathway
+                    }),
+                    cache: 'no-store'
+                });
+
+                console.log(`[Encrypt] Response status: ${response.status}`);
+
+                if (!response.ok) {
+                    let errorMessage = 'Encryption failed';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.detail || error.message || errorMessage;
+                    } catch (e) {
+                        if (response.status === 400) {
+                            errorMessage = 'Bad request - check your file format';
+                        } else if (response.status === 413) {
+                            errorMessage = 'File too large for your tier';
+                        } else if (response.status === 429) {
+                            errorMessage = 'Rate limit exceeded - please wait and try again';
+                        } else if (response.status === 500) {
+                            errorMessage = 'Server error - please try again';
+                        } else {
+                            errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        }
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log(`[Encrypt] Success! Encryption time: ${result.encryption_time_ms}ms`);
+
+                // Update usage
+                if (result.usage) {
+                    usageCount = result.usage.current;
+                    document.getElementById('usageCount').textContent = usageCount;
+                }
+
+                return {
+                    ciphertext: result.ciphertext,
+                    key: result.key,
+                    pathway: result.pathway_used
+                };
+            } catch (error) {
+                console.error(`[Encrypt] Error (attempt ${retryCount + 1}):`, error);
+                
+                const errorMsg = error.message || '';
+                
+                // Check if this is a retryable network error
+                const isNetworkError = errorMsg === 'Load failed' || 
+                                       errorMsg === 'Failed to fetch' ||
+                                       errorMsg.includes('NetworkError') ||
+                                       errorMsg.includes('network');
+                
+                // Retry on network errors (up to MAX_RETRIES times)
+                if (isNetworkError && retryCount < MAX_RETRIES) {
+                    console.log(`[Encrypt] Network error, retrying in 500ms... (${retryCount + 1}/${MAX_RETRIES})`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return encryptFile(file, pathway, retryCount + 1);
+                }
+                
+                // Improve error message for network errors
+                if (isNetworkError) {
+                    throw new Error('Network error - please check your connection and try again');
+                }
+                
+                throw error;
             }
-
-            const result = await response.json();
-
-            // Update usage
-            if (result.usage) {
-                usageCount = result.usage.current;
-                document.getElementById('usageCount').textContent = usageCount;
-            }
-
-            return {
-                ciphertext: result.ciphertext,
-                key: result.key,
-                pathway: result.pathway_used
-            };
         }
 
         // File to Base64
@@ -2340,6 +2604,218 @@
             });
         }
 
+        // Generate README for decrypted files
+        function generateDecryptReadme(pathway, results, timestamp) {
+            const pathwayId = ((pathway[0]-1) * 343) + ((pathway[1]-1) * 49) + ((pathway[2]-1) * 7) + pathway[3];
+            const fileList = results.map(r => `  • ${r.name}`).join('\n');
+            const totalTime = results.reduce((sum, r) => sum + (r.decryptionTime || 0), 0).toFixed(2);
+            
+            return `╔═══════════════════════════════════════════════════════════════════╗
+║         PATENT #65 DECRYPTED FILES - THE REVELATION 🔓            ║
+║                Seven Cubed Seven Labs LLC                         ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+Decrypted: ${new Date().toISOString()}
+Pathway Used: [${pathway.join(', ')}]
+Files Recovered: ${results.length}
+
+═══════════════════════════════════════════════════════════════════
+                    THE UNVEILING CEREMONY
+═══════════════════════════════════════════════════════════════════
+
+"What was hidden shall be revealed. What was sealed shall be opened."
+
+Your encrypted data traveled through 4 shells on the way IN.
+Now it has journeyed back through 4 shells on the way OUT.
+
+The same pathway that locked it... unlocked it.
+The same key that sealed it... revealed it.
+
+While Babylon uses 666 (6³ + 6² + 6 = incomplete),
+The ARK uses 2,401 (7⁴ = complete protection).
+
+This is not just decryption.
+This is ARCHITECTURAL PRECISION. 🎯
+
+═══════════════════════════════════════════════════════════════════
+                   THE REVERSE JOURNEY
+═══════════════════════════════════════════════════════════════════
+
+Your data just traveled BACKWARDS through the shells:
+
+  🔓 Shell 4: Physical Layer    ← Outer seal broken
+        ↓
+  🔓 Shell 3: Network Layer     ← Third barrier removed  
+        ↓
+  🔓 Shell 2: Transport Layer   ← Second shield lifted
+        ↓
+  🔓 Shell 1: Application Layer ← Final lock released
+        ↓
+  ✨ YOUR ORIGINAL FILE ✨
+
+4 shells unlocked in perfect sequence.
+Each layer authenticated. Each layer verified.
+Total decryption time: ${totalTime}ms
+(Yes, that's milliseconds. We're fast like that. 🚀)
+
+═══════════════════════════════════════════════════════════════════
+                      FILES RECOVERED
+═══════════════════════════════════════════════════════════════════
+
+${fileList}
+
+═══════════════════════════════════════════════════════════════════
+                    📊 THE MATH CHECK 📊
+═══════════════════════════════════════════════════════════════════
+
+You used pathway [${pathway.join(', ')}]
+That's pathway #${pathwayId} out of 2,401 possible combinations.
+
+If someone tried to brute-force guess your pathway:
+  • Random guess success rate: 0.042% (1 in 2,401)
+  • Add the 64-character key: 1 in 2^256 × 2,401
+  • That's more combinations than atoms in the universe
+
+"They tried 666 combinations. We used 2,401." 😎
+
+═══════════════════════════════════════════════════════════════════
+               🔐 THE THREE-LEGGED STOOL 🔐  
+═══════════════════════════════════════════════════════════════════
+
+Your decryption required ALL THREE components:
+
+  ✅ The .encrypted file (the vault)
+  ✅ The .key file (the master key)
+  ✅ The pathway [${pathway.join(', ')}] (the combination)
+
+Missing even ONE? The vault would stay SEALED. 🔒
+
+This is the Three-Legged Stool of security:
+- Remove ANY leg and it falls
+- All three are useless without each other
+- True defense-in-depth achieved
+
+═══════════════════════════════════════════════════════════════════
+                 🔐 SECURITY REMINDER 🔐  
+═══════════════════════════════════════════════════════════════════
+
+Now that your files are decrypted:
+
+  ⚠️  They're back to their original, unprotected state
+  ⚠️  Anyone with access can read them
+  ⚠️  Consider re-encrypting if storing in the cloud
+
+Want to protect them again? Visit:
+  → https://secure.sevencubedsevenlabs.com
+
+Your original .encrypted files? Delete them if no longer needed.
+Your .key files? Keep them if you want to verify authenticity later.
+
+═══════════════════════════════════════════════════════════════════
+                   THE PROPHETIC PARALLEL
+═══════════════════════════════════════════════════════════════════
+
+Encryption was SEALING.
+Decryption is REVELATION.
+
+Just as the 7 seals in Revelation are opened in sequence,
+Your data was unsealed through 7-based architecture:
+
+  7 × 7 × 7 × 7 = 2,401 pathways
+  
+While Babylon operates in 6s (incomplete):
+  6³ + 6² + 6 = 666 (the mark of incompleteness)
+
+We operate in 7s (complete):
+  7³ × 7 = 2,401 (the seal of perfection)
+
+Your data wasn't just encrypted.
+It was SEALED with divine mathematics.
+
+Now? It's been REVEALED. 🔓
+
+═══════════════════════════════════════════════════════════════════
+                   THE DIVINE COMEDY CONTINUES
+═══════════════════════════════════════════════════════════════════
+
+Q: How many hackers does it take to crack Patent #65?
+A: We don't know - none have succeeded yet! 🎭
+
+Q: Why did the encrypted file go to therapy?
+A: It had too many layers to unpack! 🛋️
+
+Q: What's a cryptographer's favorite dance?
+A: The algorithm! 💃
+
+Fun Fact #1: Your pathway creates pathway ID #${pathwayId}
+Fun Fact #2: 60 × 2,401 = 144,060 key-pathway combinations per cycle
+Fun Fact #3: gcd(60, 2401) = 1 ensures perfect key rotation
+Fun Fact #4: Each shell uses a DIFFERENT cryptographic family
+Fun Fact #5: Breaking 3 shells = still nothing. Only 4/4 = access.
+
+═══════════════════════════════════════════════════════════════════
+                        WHAT'S NEXT?
+═══════════════════════════════════════════════════════════════════
+
+After successful decryption:
+
+  ✅ Your original files are restored
+  ✅ Delete the .encrypted files (if no longer needed)
+  ✅ KEEP the .key files (in case you need to verify)
+  ✅ Remember the pathway (for future encryptions)
+
+Want to encrypt MORE files?
+  → Visit: https://secure.sevencubedsevenlabs.com
+
+Want to integrate encryption into YOUR app?
+  → API Docs: https://api.sevencubedsevenlabs.com/docs
+
+Want to learn the mathematics?
+  → Website: https://sevencubedsevenlabs.com
+
+═══════════════════════════════════════════════════════════════════
+                         SUPPORT
+═══════════════════════════════════════════════════════════════════
+
+📧 Email: 7cubed7@proton.me
+📖 Docs: https://api.sevencubedsevenlabs.com/docs
+🌐 Web: https://sevencubedsevenlabs.com
+🔐 Encrypt: https://secure.sevencubedsevenlabs.com
+
+For Enterprise:
+  Custom pathways, on-premise deployment, SLA guarantees
+  Contact: 7cubed7@proton.me (subject: "Enterprise Inquiry")
+
+═══════════════════════════════════════════════════════════════════
+
+                    7³ × 7 = 2,401
+            The Seal Architecture • Patent Pending
+        
+     "What was sealed with 7 can only be revealed with 7"
+              The Alternative to Babylon • Since 2025
+
+                    🔓 REVELATION COMPLETE 🔓
+
+═══════════════════════════════════════════════════════════════════
+
+    Thank you for trusting Patent #65 with your data.
+    
+    Your files passed through 4 shells to be sealed.
+    They passed through 4 shells to be revealed.
+    
+    This is not just cryptography.
+    This is ARCHITECTURAL PRECISION.
+    
+    Welcome back to the plaintext.
+    
+    — Seven Cubed Seven Labs LLC
+       Building the Alternative to Babylon
+       One Pathway at a Time ⚡
+
+═══════════════════════════════════════════════════════════════════
+`;
+        }
+
         // Download All as ZIP
         async function downloadAllAsZip() {
             if (encryptedResults.length === 0) return;
@@ -2349,7 +2825,9 @@
             const timestamp = new Date().toISOString().slice(0, 10);
 
             if (currentMode === 'decrypt') {
-                // DECRYPT MODE - Add decrypted files with README
+                // DECRYPT MODE - Add decrypted files + README
+                
+                // Add all decrypted files
                 for (const result of encryptedResults) {
                     try {
                         // Decode from base64
@@ -2365,52 +2843,8 @@
                     }
                 }
                 
-                // Add README for decrypted files
-                const decryptReadme = `╔═══════════════════════════════════════════════════════════════════╗
-║           PATENT #65 DECRYPTED FILES - UNLOCKED 🔓               ║
-║                Seven Cubed Seven Labs LLC                         ║
-╚═══════════════════════════════════════════════════════════════════╝
-
-Decrypted: ${new Date().toISOString()}
-Pathway Used: [${pathway.join(', ')}]
-Files Recovered: ${encryptedResults.length}
-
-═══════════════════════════════════════════════════════════════════
-                    YOUR FILES ARE RESTORED
-═══════════════════════════════════════════════════════════════════
-
-✅ These files have been successfully decrypted
-✅ They are now in their original format
-✅ You can use them normally
-
-FILES IN THIS PACKAGE:
-${encryptedResults.map(r => `  • ${r.name}`).join('\n')}
-
-═══════════════════════════════════════════════════════════════════
-                    SECURITY REMINDER
-═══════════════════════════════════════════════════════════════════
-
-🔐 Keep your encrypted backups safe
-🔑 Keep your keys in Bitwarden/password manager
-🛡️ Re-encrypt when done if these are sensitive files
-
-═══════════════════════════════════════════════════════════════════
-                    NEED TO ENCRYPT AGAIN?
-═══════════════════════════════════════════════════════════════════
-
-🌐 Visit: https://secure.sevencubedsevenlabs.com
-📚 Docs:  https://api.sevencubedsevenlabs.com/docs
-📧 Help:  7cubed7@proton.me
-
-═══════════════════════════════════════════════════════════════════
-
-"They decrypt once. You decrypt with 2,401 pathways of precision."
-
-7³ × 7 = 2,401 | Patent #65 | Seven Cubed Seven Labs LLC
-https://sevencubedsevenlabs.com
-
-═══════════════════════════════════════════════════════════════════
-`;
+                // Generate README for decrypted files
+                const decryptReadme = generateDecryptReadme(pathway, encryptedResults, timestamp);
                 zip.file('README.txt', decryptReadme);
                 
                 // Generate and download
@@ -2570,9 +3004,6 @@ To decrypt ANY file, you need ALL THREE:
                 clearApiKey();
                 return;
             }
-            // FIX: Show validating state before API call
-            document.getElementById('keyStatus').textContent = '⏳ Validating key...';
-            document.getElementById('keyStatus').className = 'key-status';
             await validateApiKey(key);
         }
 
@@ -2594,21 +3025,11 @@ To decrypt ANY file, you need ALL THREE:
                     document.getElementById('keyStatus').textContent = `✅ API key applied - ${result.tier.charAt(0).toUpperCase() + result.tier.slice(1)} Plan active`;
                     document.getElementById('keyStatus').className = 'key-status valid';
                 } else {
-                    // FIX: Reset to free tier on invalid key
-                    currentApiKey = '';
-                    currentTier = 'free';
-                    localStorage.removeItem(STORAGE_KEY);
-                    updateTierDisplay('free', null);
-                    document.getElementById('keyStatus').textContent = '❌ ' + (result.message || 'Invalid API key');
+                    document.getElementById('keyStatus').textContent = '❌ ' + result.message;
                     document.getElementById('keyStatus').className = 'key-status invalid';
                 }
             } catch (error) {
-                // FIX: Reset to free tier on network error
-                currentApiKey = '';
-                currentTier = 'free';
-                localStorage.removeItem(STORAGE_KEY);
-                updateTierDisplay('free', null);
-                document.getElementById('keyStatus').textContent = '❌ Could not validate key - please try again';
+                document.getElementById('keyStatus').textContent = '❌ Could not validate key';
                 document.getElementById('keyStatus').className = 'key-status invalid';
             }
         }
@@ -2645,21 +3066,21 @@ To decrypt ANY file, you need ALL THREE:
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '∞';
                 usageLabel.textContent = 'unlimited';
-                if (maxFileSizeDisplay) maxFileSizeDisplay.textContent = '100MB';
+                maxFileSizeDisplay.textContent = '100MB';
             } else if (tier === 'starter') {
                 tierIcon.textContent = '⭐';
                 tierName.textContent = 'Starter Plan';
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '50,000';
                 usageLabel.textContent = 'encryptions this month';
-                if (maxFileSizeDisplay) maxFileSizeDisplay.textContent = '50MB';
+                maxFileSizeDisplay.textContent = '50MB';
             } else {
                 tierIcon.textContent = '🆓';
                 tierName.textContent = 'Free Tier';
                 usageCountEl.textContent = usage?.current || 0;
                 usageLimitEl.textContent = '100';
                 usageLabel.textContent = 'encryptions today';
-                if (maxFileSizeDisplay) maxFileSizeDisplay.textContent = '10MB';
+                maxFileSizeDisplay.textContent = '10MB';
             }
 
             usageCount = usage?.current || 0;
