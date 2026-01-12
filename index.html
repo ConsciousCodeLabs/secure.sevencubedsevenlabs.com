@@ -835,6 +835,34 @@
             transform: translateY(-1px);
         }
 
+        .results-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-start-fresh {
+            background: var(--dark-lighter);
+            color: var(--gray);
+            padding: 0.65rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn-start-fresh:hover, .btn-start-fresh:active {
+            background: var(--dark);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
         .results-summary {
             font-size: 0.85rem;
             color: var(--gray);
@@ -1450,9 +1478,14 @@
                 <section class="results-section" id="resultsSection" role="status" aria-live="polite">
                     <div class="results-header">
                         <div class="results-title">✅ Encryption Complete!</div>
-                        <button class="btn-download-all" onclick="downloadAllAsZip()" aria-label="Download all files as ZIP">
-                            📦 Download All (ZIP)
-                        </button>
+                        <div class="results-buttons">
+                            <button class="btn-download-all" onclick="downloadAllAsZip()" aria-label="Download all files as ZIP">
+                                📦 Download All (ZIP)
+                            </button>
+                            <button class="btn-start-fresh" onclick="startFresh()" aria-label="Start fresh">
+                                🔄 Start Fresh
+                            </button>
+                        </div>
                     </div>
                     <div class="results-summary" id="resultsSummary">
                         0 files encrypted successfully
@@ -1894,6 +1927,28 @@
             document.getElementById('downloadBtn').disabled = true;
         }
 
+        // Start Fresh - Reset everything for next batch
+        function startFresh() {
+            // Clear files and results
+            filesToEncrypt = [];
+            encryptedResults = [];
+            
+            // Clear keys (decrypt mode)
+            keyFiles = [];
+            document.getElementById('manualKeyInput').value = '';
+            updateKeyFilesList();
+            
+            // Reset UI
+            updateFileQueue();
+            updateEncryptButton();
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('batchProgress').classList.remove('active');
+            document.getElementById('downloadBtn').disabled = true;
+            
+            // Scroll back to drop zone
+            document.querySelector('.drop-zone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
         // Update Encrypt Button State
         function updateEncryptButton() {
             const btn = document.getElementById('encryptBtn');
@@ -1977,7 +2032,16 @@
                     item.status = 'error';
                     item.progress = 0;
                     console.error(`Error encrypting ${item.name}:`, error);
-                    alert(`Error encrypting ${item.name}: ${error.message}`);
+                    
+                    // Helpful error message
+                    const errorMsg = error.message || 'Unknown error';
+                    alert(`❌ Encryption failed for ${item.name}\n\n` +
+                          `Error: ${errorMsg}\n\n` +
+                          `Please verify:\n` +
+                          `• File size is within your tier limit\n` +
+                          `• Network connection is stable\n` +
+                          `• API key is valid (if using paid tier)\n\n` +
+                          `Tip: Click "Retry Failed" to try again.`);
                 }
 
                 updateFileQueue();
@@ -1995,6 +2059,8 @@
                     document.getElementById('resultsSummary').textContent = 
                         `${encryptedResults.length} file${encryptedResults.length > 1 ? 's' : ''} encrypted with pathway [${pathway.join(', ')}] • Protected by 4 shells 🐚🐚🐚🐚`;
                     document.getElementById('downloadBtn').disabled = false;
+                    // Scroll to results
+                    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 500);
 
@@ -2079,7 +2145,17 @@
                     item.status = 'error';
                     item.progress = 0;
                     console.error(`Error decrypting ${item.name}:`, error);
-                    alert(`Error decrypting ${item.name}: ${error.message}`);
+                    
+                    // Helpful error message with troubleshooting tips
+                    const errorMsg = error.message || 'Unknown error';
+                    const pathway = getPathway();
+                    alert(`❌ Decryption failed for ${item.name}\n\n` +
+                          `Error: ${errorMsg}\n\n` +
+                          `Please verify:\n` +
+                          `• Pathway [${pathway.join(', ')}] matches the original encryption\n` +
+                          `• Correct .key file is loaded for this specific file\n` +
+                          `• File was encrypted with Patent #65\n\n` +
+                          `Tip: Try adjusting the pathway and click "Retry Failed" to try again.`);
                 }
 
                 updateFileQueue();
@@ -2099,6 +2175,8 @@
                         `${encryptedResults.length} file${encryptedResults.length > 1 ? 's' : ''} decrypted with pathway [${pathway.join(', ')}] • Unwrapped from 4 shells 🎁`;
                     document.querySelector('.results-joke').textContent = 'Your files have been safely unwrapped from their 4-shell cocoon! 🦋';
                     document.getElementById('downloadBtn').disabled = false;
+                    // Scroll to results
+                    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 500);
 
