@@ -2349,7 +2349,7 @@
             const timestamp = new Date().toISOString().slice(0, 10);
 
             if (currentMode === 'decrypt') {
-                // DECRYPT MODE - Just add the decrypted files
+                // DECRYPT MODE - Add decrypted files with README
                 for (const result of encryptedResults) {
                     try {
                         // Decode from base64
@@ -2364,6 +2364,54 @@
                         zip.file(result.name, result.plaintext);
                     }
                 }
+                
+                // Add README for decrypted files
+                const decryptReadme = `╔═══════════════════════════════════════════════════════════════════╗
+║           PATENT #65 DECRYPTED FILES - UNLOCKED 🔓               ║
+║                Seven Cubed Seven Labs LLC                         ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+Decrypted: ${new Date().toISOString()}
+Pathway Used: [${pathway.join(', ')}]
+Files Recovered: ${encryptedResults.length}
+
+═══════════════════════════════════════════════════════════════════
+                    YOUR FILES ARE RESTORED
+═══════════════════════════════════════════════════════════════════
+
+✅ These files have been successfully decrypted
+✅ They are now in their original format
+✅ You can use them normally
+
+FILES IN THIS PACKAGE:
+${encryptedResults.map(r => `  • ${r.name}`).join('\n')}
+
+═══════════════════════════════════════════════════════════════════
+                    SECURITY REMINDER
+═══════════════════════════════════════════════════════════════════
+
+🔐 Keep your encrypted backups safe
+🔑 Keep your keys in Bitwarden/password manager
+🛡️ Re-encrypt when done if these are sensitive files
+
+═══════════════════════════════════════════════════════════════════
+                    NEED TO ENCRYPT AGAIN?
+═══════════════════════════════════════════════════════════════════
+
+🌐 Visit: https://secure.sevencubedsevenlabs.com
+📚 Docs:  https://api.sevencubedsevenlabs.com/docs
+📧 Help:  7cubed7@proton.me
+
+═══════════════════════════════════════════════════════════════════
+
+"They decrypt once. You decrypt with 2,401 pathways of precision."
+
+7³ × 7 = 2,401 | Patent #65 | Seven Cubed Seven Labs LLC
+https://sevencubedsevenlabs.com
+
+═══════════════════════════════════════════════════════════════════
+`;
+                zip.file('README.txt', decryptReadme);
                 
                 // Generate and download
                 const content = await zip.generateAsync({ type: 'blob' });
