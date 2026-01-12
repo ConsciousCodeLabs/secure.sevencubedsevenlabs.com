@@ -1889,6 +1889,15 @@
             const maxSize = getMaxFileSize();
             const maxSizeMB = getMaxFileSizeMB();
             
+            // Clear completed/errored files when adding new ones (fresh start)
+            const previouslyDone = filesToEncrypt.filter(f => f.status === 'done' || f.status === 'error').length;
+            if (previouslyDone > 0) {
+                console.log(`[Queue] Clearing ${previouslyDone} completed/errored files before adding new ones`);
+                filesToEncrypt = filesToEncrypt.filter(f => f.status !== 'done' && f.status !== 'error');
+                encryptedResults = [];  // Also clear results
+                document.getElementById('resultsSection').classList.remove('active');
+            }
+            
             // In decrypt mode, validate .encrypted extension
             const rejectedFiles = [];
             const validFiles = [];
@@ -2234,8 +2243,25 @@
                         throw new Error('No decryption key found for this file');
                     }
                     
-                    // Use stored content if available (prevents stale File object issues)
-                    const result = await decryptFile(item.content || item.file, pathway, key, item.name);
+                    // Ensure we have content - re-read if necessary
+                    let contentToDecrypt = item.content;
+                    if (!contentToDecrypt || contentToDecrypt.length === 0) {
+                        console.log(`[Decrypt] Content missing for ${item.name}, re-reading...`);
+                        if (item.file) {
+                            try {
+                                contentToDecrypt = await item.file.text();
+                                item.content = contentToDecrypt;  // Cache it
+                                console.log(`[Decrypt] Re-read ${contentToDecrypt.length} chars`);
+                            } catch (readErr) {
+                                console.error(`[Decrypt] Failed to re-read file:`, readErr);
+                                throw new Error('File content unavailable - please re-upload the file');
+                            }
+                        } else {
+                            throw new Error('File content unavailable - please re-upload the file');
+                        }
+                    }
+                    
+                    const result = await decryptFile(contentToDecrypt, pathway, key, item.name);
                     item.status = 'done';
                     item.progress = 100;
                     item.result = result;
@@ -2283,8 +2309,10 @@
             updateEncryptButton();
         }
 
-        // Decrypt Single File
-        async function decryptFile(fileOrContent, pathway, key, fileName = 'unknown') {
+        // Decrypt Single File (with retry for network errors)
+        async function decryptFile(fileOrContent, pathway, key, fileName = 'unknown', retryCount = 0) {
+            const MAX_RETRIES = 2;
+            
             try {
                 // Get ciphertext - either from stored content (string) or read from File object
                 let ciphertext;
@@ -2296,6 +2324,11 @@
                     // Read from File object (fallback)
                     console.log(`[Decrypt] Reading file: ${fileOrContent.name} (${fileOrContent.size} bytes)`);
                     ciphertext = await fileOrContent.text();
+                }
+                
+                // Validate we have content
+                if (!ciphertext || ciphertext.length === 0) {
+                    throw new Error('No content to decrypt - file may be empty');
                 }
                 
                 // Clean the ciphertext - remove any whitespace, newlines, BOM
@@ -2313,7 +2346,7 @@
                     throw new Error(`Invalid key format - must be 64 hex characters (got ${cleanKey.length})`);
                 }
                 
-                console.log(`[Decrypt] Sending to API with pathway: [${pathway.join(', ')}]`);
+                console.log(`[Decrypt] Sending to API with pathway: [${pathway.join(', ')}] (attempt ${retryCount + 1})`);
                 
                 const requestBody = JSON.stringify({
                     ciphertext: cleanCiphertext,
@@ -2323,13 +2356,18 @@
                 
                 console.log(`[Decrypt] Request body size: ${requestBody.length} bytes`);
 
-                const response = await fetch(`${API_BASE}/decrypt`, {
+                // Add cache-busting timestamp to prevent stale connections
+                const url = `${API_BASE}/decrypt?_t=${Date.now()}`;
+                
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store',
                         ...(currentApiKey && { 'X-API-Key': currentApiKey })
                     },
-                    body: requestBody
+                    body: requestBody,
+                    cache: 'no-store'  // Prevent browser caching
                 });
 
                 console.log(`[Decrypt] Response status: ${response.status}`);
@@ -2366,22 +2404,31 @@
                 
                 return result;
             } catch (error) {
-                console.error(`[Decrypt] Error:`, error);
+                console.error(`[Decrypt] Error (attempt ${retryCount + 1}):`, error);
                 
-                // Categorize and improve error messages
                 const errorMsg = error.message || '';
                 
-                if (errorMsg === 'Load failed' || errorMsg === 'Failed to fetch') {
-                    // True network error - but could also be CORS or timeout
+                // Check if this is a retryable network error
+                const isNetworkError = errorMsg === 'Load failed' || 
+                                       errorMsg === 'Failed to fetch' ||
+                                       errorMsg.includes('NetworkError') ||
+                                       errorMsg.includes('network');
+                
+                // Retry on network errors (up to MAX_RETRIES times)
+                if (isNetworkError && retryCount < MAX_RETRIES) {
+                    console.log(`[Decrypt] Network error, retrying in 500ms... (${retryCount + 1}/${MAX_RETRIES})`);
+                    await new Promise(resolve => setTimeout(resolve, 500));  // Wait 500ms before retry
+                    return decryptFile(fileOrContent, pathway, key, fileName, retryCount + 1);
+                }
+                
+                // Categorize and improve error messages
+                if (isNetworkError) {
                     throw new Error('Network error - please check your connection and try again');
                 } else if (errorMsg.includes('verification failed') || errorMsg.includes('Decryption failed')) {
-                    // API returned decryption error - this is the KEY insight!
                     throw new Error(errorMsg);
                 } else if (errorMsg.includes('Invalid')) {
-                    // Validation error
                     throw new Error(errorMsg);
                 } else {
-                    // Unknown error - pass through
                     throw error;
                 }
             }
