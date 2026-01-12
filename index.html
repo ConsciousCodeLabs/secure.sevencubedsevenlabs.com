@@ -1066,6 +1066,11 @@
             color: var(--accent);
         }
 
+        .key-file-item .match-status.waiting {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
         .key-file-item .match-status.unmatched {
             background: rgba(239, 68, 68, 0.2);
             color: var(--error);
@@ -1760,6 +1765,9 @@
             
             listEl.style.display = 'block';
             
+            // Check if there are ANY encrypted files in the queue
+            const hasAnyEncryptedFiles = filesToEncrypt.length > 0;
+            
             listEl.innerHTML = keyFiles.map((keyFile, index) => {
                 // Check if there's a matching encrypted file
                 const hasMatch = filesToEncrypt.some(f => {
@@ -1767,12 +1775,27 @@
                     return encryptedBase === keyFile.name;
                 });
                 
+                // Determine status: matched, waiting (no files yet), or no match
+                let statusClass, statusText;
+                if (hasMatch) {
+                    statusClass = 'matched';
+                    statusText = '✓ matched';
+                } else if (!hasAnyEncryptedFiles) {
+                    // No files uploaded yet - key is ready and waiting
+                    statusClass = 'waiting';
+                    statusText = '⏳ ready';
+                } else {
+                    // Files exist but none match this key
+                    statusClass = 'unmatched';
+                    statusText = '⚠ no match';
+                }
+                
                 return `
                     <div class="key-file-item">
                         <span>🔑</span>
                         <span>${escapeHtml(keyFile.fileName)}</span>
-                        <span class="match-status ${hasMatch ? 'matched' : 'unmatched'}">
-                            ${hasMatch ? '✓ matched' : '⚠ no match'}
+                        <span class="match-status ${statusClass}">
+                            ${statusText}
                         </span>
                         <button class="file-remove" onclick="removeKeyFile(${index})" aria-label="Remove key">×</button>
                     </div>
@@ -1993,10 +2016,19 @@
         }
 
         // Reset Error Status - allows retry without clearing files
-        function resetErrors() {
+        async function resetErrors() {
             let errorsReset = 0;
             for (const item of filesToEncrypt) {
                 if (item.status === 'error') {
+                    // If content is missing (shouldn't happen, but defensive), try to re-read
+                    if (currentMode === 'decrypt' && !item.content && item.file) {
+                        try {
+                            console.log(`[Reset] Re-reading content for ${item.name}`);
+                            item.content = await item.file.text();
+                        } catch (e) {
+                            console.warn(`[Reset] Could not re-read ${item.name}, will try with File object`);
+                        }
+                    }
                     item.status = 'pending';
                     item.progress = 0;
                     errorsReset++;
