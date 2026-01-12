@@ -868,6 +868,34 @@
             transform: translateY(-1px);
         }
 
+        .results-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-start-fresh {
+            background: var(--surface);
+            color: var(--gray);
+            padding: 0.65rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn-start-fresh:hover, .btn-start-fresh:active {
+            background: var(--dark);
+            color: var(--text);
+            border-color: var(--primary);
+        }
+
         .results-summary {
             font-size: 0.85rem;
             color: var(--gray);
@@ -1491,9 +1519,14 @@
                 <section class="results-section" id="resultsSection" role="status" aria-live="polite">
                     <div class="results-header">
                         <div class="results-title">✅ Encryption Complete!</div>
-                        <button class="btn-download-all" onclick="downloadAllAsZip()" aria-label="Download all files as ZIP">
-                            📦 Download All (ZIP)
-                        </button>
+                        <div class="results-buttons">
+                            <button class="btn-download-all" onclick="downloadAllAsZip()" aria-label="Download all files as ZIP">
+                                📦 Download All (ZIP)
+                            </button>
+                            <button class="btn-start-fresh" onclick="startFresh()" aria-label="Clear form and start fresh">
+                                🔄 Start Fresh
+                            </button>
+                        </div>
                     </div>
                     <div class="results-summary" id="resultsSummary">
                         0 files encrypted successfully
@@ -2047,6 +2080,38 @@
             document.getElementById('downloadBtn').disabled = true;
         }
 
+        // Start Fresh - clear everything and reset form
+        function startFresh() {
+            console.log('[Fresh] Starting fresh - clearing all state');
+            
+            // Clear files
+            filesToEncrypt = [];
+            encryptedResults = [];
+            
+            // Clear keys
+            keyFiles = [];
+            document.getElementById('manualKeyInput').value = '';
+            updateKeyFilesList();
+            
+            // Reset UI
+            updateFileQueue();
+            updateEncryptButton();
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('batchProgress').classList.remove('active');
+            document.getElementById('downloadBtn').disabled = true;
+            
+            // Reset pathway to default [1,1,1,1]
+            document.querySelectorAll('.pathway-input').forEach(input => {
+                input.value = '1';
+            });
+            document.getElementById('pathwayDisplay').textContent = '[1, 1, 1, 1]';
+            
+            // Scroll to top of main content
+            document.querySelector('.drop-zone').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            console.log('[Fresh] Form cleared - ready for new files!');
+        }
+
         // Reset Error Status - allows retry without clearing files
         async function resetErrors() {
             let errorsReset = 0;
@@ -2311,7 +2376,7 @@
 
         // Decrypt Single File (with retry for network errors)
         async function decryptFile(fileOrContent, pathway, key, fileName = 'unknown', retryCount = 0) {
-            const MAX_RETRIES = 2;
+            const MAX_RETRIES = 3;
             
             try {
                 // Get ciphertext - either from stored content (string) or read from File object
@@ -2434,41 +2499,99 @@
             }
         }
 
-        // Encrypt Single File
-        async function encryptFile(file, pathway) {
-            // Read file as base64
-            const base64 = await fileToBase64(file);
+        // Encrypt Single File (with retry for network errors)
+        async function encryptFile(file, pathway, retryCount = 0) {
+            const MAX_RETRIES = 3;
+            
+            try {
+                // Read file as base64
+                const base64 = await fileToBase64(file);
+                
+                if (!base64 || base64.length === 0) {
+                    throw new Error('Failed to read file content');
+                }
+                
+                console.log(`[Encrypt] Sending ${file.name} (${base64.length} chars base64) with pathway [${pathway.join(', ')}] (attempt ${retryCount + 1})`);
 
-            const response = await fetch(`${API_BASE}/encrypt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(currentApiKey && { 'X-API-Key': currentApiKey })
-                },
-                body: JSON.stringify({
-                    plaintext: base64,
-                    pathway: pathway
-                })
-            });
+                // Add cache-busting timestamp to prevent stale connections
+                const url = `${API_BASE}/encrypt?_t=${Date.now()}`;
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Encryption failed');
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store',
+                        ...(currentApiKey && { 'X-API-Key': currentApiKey })
+                    },
+                    body: JSON.stringify({
+                        plaintext: base64,
+                        pathway: pathway
+                    }),
+                    cache: 'no-store'
+                });
+
+                console.log(`[Encrypt] Response status: ${response.status}`);
+
+                if (!response.ok) {
+                    let errorMessage = 'Encryption failed';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.detail || error.message || errorMessage;
+                    } catch (e) {
+                        if (response.status === 400) {
+                            errorMessage = 'Bad request - check your file format';
+                        } else if (response.status === 413) {
+                            errorMessage = 'File too large for your tier';
+                        } else if (response.status === 429) {
+                            errorMessage = 'Rate limit exceeded - please wait and try again';
+                        } else if (response.status === 500) {
+                            errorMessage = 'Server error - please try again';
+                        } else {
+                            errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        }
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log(`[Encrypt] Success! Encryption time: ${result.encryption_time_ms}ms`);
+
+                // Update usage
+                if (result.usage) {
+                    usageCount = result.usage.current;
+                    document.getElementById('usageCount').textContent = usageCount;
+                }
+
+                return {
+                    ciphertext: result.ciphertext,
+                    key: result.key,
+                    pathway: result.pathway_used
+                };
+            } catch (error) {
+                console.error(`[Encrypt] Error (attempt ${retryCount + 1}):`, error);
+                
+                const errorMsg = error.message || '';
+                
+                // Check if this is a retryable network error
+                const isNetworkError = errorMsg === 'Load failed' || 
+                                       errorMsg === 'Failed to fetch' ||
+                                       errorMsg.includes('NetworkError') ||
+                                       errorMsg.includes('network');
+                
+                // Retry on network errors (up to MAX_RETRIES times)
+                if (isNetworkError && retryCount < MAX_RETRIES) {
+                    console.log(`[Encrypt] Network error, retrying in 500ms... (${retryCount + 1}/${MAX_RETRIES})`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    return encryptFile(file, pathway, retryCount + 1);
+                }
+                
+                // Improve error message for network errors
+                if (isNetworkError) {
+                    throw new Error('Network error - please check your connection and try again');
+                }
+                
+                throw error;
             }
-
-            const result = await response.json();
-
-            // Update usage
-            if (result.usage) {
-                usageCount = result.usage.current;
-                document.getElementById('usageCount').textContent = usageCount;
-            }
-
-            return {
-                ciphertext: result.ciphertext,
-                key: result.key,
-                pathway: result.pathway_used
-            };
         }
 
         // File to Base64
